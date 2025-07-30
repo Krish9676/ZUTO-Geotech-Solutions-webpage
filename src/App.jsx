@@ -1,7 +1,6 @@
 import Navbar from './components/Navbar'
 import HeroSection from './components/HeroSection'
 import Benefits from './components/Benefits'
-import ServicesTabs from './components/ServicesTabs'
 import ServiceDetail from './components/ServiceDetail'
 import LiveDemoWidget from './components/LiveDemoWidget'
 import ArchitectureDiagram from './components/ArchitectureDiagram'
@@ -19,7 +18,6 @@ function App() {
       <main>
         <HeroSection />
         <Benefits />
-        <ServicesTabs />
         <ServiceDetail />
         <LiveDemoWidget />
         <ArchitectureDiagram />
