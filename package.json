@@ -2,6 +2,7 @@
   "name": "tovi-geotech-solutions",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "AI-Powered AgriTech SaaS Landing Page",
   "scripts": {
     "dev": "vite",
