@@ -68,39 +68,55 @@ const services = [
 
 const techIcons = {
   FastAPI: <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg" alt="FastAPI" className="w-7 h-7" />,
-  Supabase: <img src="https://avatars.githubusercontent.com/u/54469796?s=200&v=4" alt="Supabase" className="w-7 h-7 rounded" />,
-  Llama: <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="Llama" className="w-7 h-7" />,
+  Supabase: <img src="https://avatars.githubusercontent.com/u/54469796?s=200&v=4" alt="Supabase" className="w-7 h-7" />,
+  Llama: <img src="https://ollama.ai/favicon-32x32.png" alt="Llama" className="w-7 h-7" />,
   Mapbox: <img src="https://seeklogo.com/images/M/mapbox-logo-09B5A0296E-seeklogo.com.png" alt="Mapbox" className="w-7 h-7" />,
-  Hyperledger: <img src="https://avatars.githubusercontent.com/u/7657900?s=200&v=4" alt="Hyperledger" className="w-7 h-7 rounded" />,
+  Hyperledger: <img src="https://avatars.githubusercontent.com/u/7657900?s=200&v=4" alt="Hyperledger" className="w-7 h-7" />,
 };
 
 const ServiceDetail = () => (
-  <section className="py-16 bg-gray-50 dark:bg-gray-800">
-    <div className="max-w-6xl mx-auto px-4 flex flex-col gap-16">
-      {services.map((s, i) => (
-        <div
-          key={s.key}
-          id={`service-${s.key}`}
-          className={`flex flex-col md:flex-row ${i % 2 === 1 ? 'md:flex-row-reverse' : ''} items-center gap-8 md:gap-16`}
-        >
-          <div className="md:w-1/2 w-full flex justify-center">
-            <img src={s.img} alt={s.title} className="rounded-xl shadow-lg w-full max-w-xs md:max-w-sm" />
-          </div>
-          <div className="md:w-1/2 w-full">
-            <h2 className="text-2xl font-bold mb-4">{s.title}</h2>
-            <ul className="mb-4 list-disc pl-5 space-y-1">
-              {s.features.map(f => <li key={f}>{f}</li>)}
-            </ul>
-            <div className="flex gap-3 mb-4">
-              {s.tech.map(t => (
-                <span key={t} title={t}>{techIcons[t]}</span>
-              ))}
+  <section id="solutions" className="py-16 bg-white dark:bg-gray-900">
+    <div className="max-w-6xl mx-auto px-4">
+      <div className="text-center mb-12">
+        <h2 className="text-3xl font-bold mb-4">Our Solutions</h2>
+        <p className="text-lg text-gray-600 dark:text-gray-300">
+          Five modular microservices designed to address every aspect of modern farming
+        </p>
+      </div>
+      
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {services.map(service => (
+          <div key={service.key} className="bg-gray-50 dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+            <img src={service.img} alt={service.title} className="w-full h-48 object-cover" />
+            <div className="p-6">
+              <h3 className="text-xl font-semibold mb-3">{service.title}</h3>
+              <ul className="space-y-2 mb-4">
+                {service.features.map((feature, i) => (
+                  <li key={i} className="flex items-start">
+                    <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-sm text-gray-600 dark:text-gray-300">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="flex items-center gap-2 mb-4">
+                {service.tech.map(tech => (
+                  <div key={tech} className="flex items-center gap-1">
+                    {techIcons[tech]}
+                    <span className="text-xs text-gray-500">{tech}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <a href={service.code} className="text-green-600 hover:text-green-700 text-sm font-medium">
+                  {service.cta}
+                </a>
+              </div>
             </div>
-            <a href={s.code} className="text-green-700 underline mr-4">Code/API Reference</a>
-            <a href="#live-demo" className="inline-block mt-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg font-semibold shadow transition">{s.cta}</a>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   </section>
 );

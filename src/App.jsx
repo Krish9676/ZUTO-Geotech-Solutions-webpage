@@ -1,15 +1,17 @@
 import Navbar from './components/Navbar'
 import HeroSection from './components/HeroSection'
 import Benefits from './components/Benefits'
+import ProblemsSolved from './components/ProblemsSolved'
 import ServiceDetail from './components/ServiceDetail'
+import TechnologySection from './components/TechnologySection'
 import LiveDemoWidget from './components/LiveDemoWidget'
-import ArchitectureDiagram from './components/ArchitectureDiagram'
 import ApiDocsPreview from './components/ApiDocsPreview'
 import PricingTable from './components/PricingTable'
 import Testimonials from './components/Testimonials'
-import TechGrid from './components/TechGrid'
+import AboutSection from './components/AboutSection'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
+import ChatWidget from './components/ChatWidget'
 
 function App() {
   return (
@@ -18,16 +20,18 @@ function App() {
       <main>
         <HeroSection />
         <Benefits />
+        <ProblemsSolved />
         <ServiceDetail />
+        <TechnologySection />
         <LiveDemoWidget />
-        <ArchitectureDiagram />
         <ApiDocsPreview />
         <PricingTable />
         <Testimonials />
-        <TechGrid />
+        <AboutSection />
         <Contact />
       </main>
       <Footer />
+      <ChatWidget />
     </div>
   )
 }

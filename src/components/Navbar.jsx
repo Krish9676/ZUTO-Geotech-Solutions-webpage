@@ -2,9 +2,11 @@ import { useState } from 'react';
 
 const links = [
   { name: 'Home', href: '#' },
-  { name: 'Features', href: '#features' },
-  { name: 'Docs', href: '#api-docs' },
-  { name: 'GitHub', href: 'https://github.com/', external: true },
+  { name: 'Solutions', href: '#solutions' },
+  { name: 'Technology', href: '#technology' },
+  { name: 'API Docs', href: '#api-docs' },
+  { name: 'Pricing', href: '#pricing' },
+  { name: 'About', href: '#about' },
   { name: 'Contact', href: '#contact' },
 ];
 

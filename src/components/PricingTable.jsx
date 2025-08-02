@@ -1,5 +1,5 @@
 const PricingTable = () => (
-  <section className="py-16 bg-gray-50 dark:bg-gray-800">
+  <section id="pricing" className="py-16 bg-gray-50 dark:bg-gray-800">
     <div className="max-w-4xl mx-auto px-4 text-center">
       <h2 className="text-2xl font-bold mb-8">Pricing & Scale-Up Path</h2>
       <div className="overflow-x-auto">
