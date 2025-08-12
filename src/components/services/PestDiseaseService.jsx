@@ -63,9 +63,11 @@ const PestDiseaseService = () => {
 
       // Call your API
       const formData = new FormData();
-      formData.append('image', selectedFile);
+      formData.append('file', selectedFile);
+      formData.append('crop_name', results.crop_name || 'unknown'); // Add crop name if available
 
-      const apiUrl = import.meta.env.VITE_PEST_DISEASE_API_URL || 'https://crop-disease-detection-api-0spd.onrender.com';
+      const apiUrl = `${import.meta.env.VITE_PEST_DISEASE_API_URL}/upload` || 
+      'https://crop-disease-detection-api-0spd.onrender.com/upload';
       const response = await fetch(apiUrl, {
         method: 'POST',
         body: formData,
