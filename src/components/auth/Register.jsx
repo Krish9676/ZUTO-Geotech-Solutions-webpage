@@ -19,7 +19,7 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const { signUp } = useAuth();
+  const { signUp, signIn } = useAuth();
   const navigate = useNavigate();
 
   const {
@@ -46,10 +46,20 @@ const Register = () => {
       if (error) {
         setError(error.message);
       } else {
-        setSuccess('Account created successfully! Please check your email to verify your account.');
-        setTimeout(() => {
-          navigate('/login');
-        }, 3000);
+        // Automatically sign in the user after successful registration
+        const { error: signInError } = await signIn(data.email, data.password);
+        
+        if (signInError) {
+          setError('Account created but automatic sign-in failed. Please sign in manually.');
+          setTimeout(() => {
+            navigate('/login');
+          }, 3000);
+        } else {
+          setSuccess('Account created and signed in successfully! Redirecting to dashboard...');
+          setTimeout(() => {
+            navigate('/dashboard');
+          }, 2000);
+        }
       }
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');

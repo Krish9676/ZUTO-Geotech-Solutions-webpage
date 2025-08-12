@@ -11,7 +11,15 @@ const PestDiseaseService = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
+  const [selectedCrop, setSelectedCrop] = useState(''); // New state for selected crop
   const fileInputRef = useRef(null);
+
+  // List of crops from the provided image
+  const cropList = [
+    'Rice', 'Maize', 'Onion', 'Cotton', 'Chilli', 'Potato', 'Wheat', 'Mustard',
+    'Sugarcane', 'Tobacco', 'Soyabean', 'Tomato', 'Mango', 'Banana', 'Papaya',
+    'Pomegranate', 'Oranges', 'Grapes', 'Cabbage', 'Cauliflower', 'Brinjal'
+  ];
 
   const handleFileSelect = (file) => {
     if (file && file.type.startsWith('image/')) {
@@ -43,6 +51,10 @@ const PestDiseaseService = () => {
 
   const analyzeImage = async () => {
     if (!selectedFile) return;
+    if (!selectedCrop) {
+      setError('Please select a crop name');
+      return;
+    }
 
     setIsAnalyzing(true);
     setError(null);
@@ -64,7 +76,7 @@ const PestDiseaseService = () => {
       // Call your API
       const formData = new FormData();
       formData.append('file', selectedFile);
-      formData.append('crop_name', results.crop_name || 'unknown'); // Add crop name if available
+      formData.append('crop_name', selectedCrop); // Pass the selected crop name
 
       const apiUrl = `${import.meta.env.VITE_PEST_DISEASE_API_URL}/upload` || 
       'https://crop-disease-detection-api-0spd.onrender.com/upload';
@@ -86,7 +98,7 @@ const PestDiseaseService = () => {
           image_url: publicUrl,
           pest_name: apiResults.pest_name || 'Unknown',
           confidence: apiResults.confidence || 0,
-          crop_name: apiResults.crop_name || 'Unknown',
+          crop_name: selectedCrop, // Save the selected crop name
           diagnosis: apiResults.diagnosis || 'No diagnosis available',
           created_by: user.id
         });
@@ -141,6 +153,28 @@ const PestDiseaseService = () => {
           </p>
         </div>
 
+        {/* Crop Selection Dropdown */}
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+          <div className="mb-6">
+            <label htmlFor="crop-select" className="block text-lg font-medium text-gray-900 mb-3">
+              Select Crop Type:
+            </label>
+            <select
+              id="crop-select"
+              value={selectedCrop}
+              onChange={(e) => setSelectedCrop(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            >
+              <option value="">-- Please select a crop --</option>
+              {cropList.map((crop) => (
+                <option key={crop} value={crop}>
+                  {crop}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
           <div className="mb-6">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Upload Image</h2>
@@ -179,7 +213,7 @@ const PestDiseaseService = () => {
                 </div>
               ) : (
                 <div>
-                  <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                  <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                     <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                   <p className="text-gray-600">
@@ -197,7 +231,7 @@ const PestDiseaseService = () => {
             )}
           </div>
 
-          {selectedFile && (
+          {selectedFile && selectedCrop && (
             <div className="text-center">
               <button
                 onClick={analyzeImage}
@@ -219,12 +253,12 @@ const PestDiseaseService = () => {
                 <h3 className="text-lg font-medium text-gray-900 mb-3">Detection Details</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Pest/Disease:</span>
-                    <span className="font-medium">{results.pest_name || 'Unknown'}</span>
+                    <span className="text-gray-600">Crop:</span>
+                    <span className="font-medium">{selectedCrop}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Crop:</span>
-                    <span className="font-medium">{results.crop_name || 'Unknown'}</span>
+                    <span className="text-gray-600">Pest/Disease:</span>
+                    <span className="font-medium">{results.pest_name || 'Unknown'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Confidence:</span>
@@ -261,22 +295,22 @@ const PestDiseaseService = () => {
               <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-green-600">1</span>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Upload Image</h3>
-              <p className="text-gray-600">Take a photo of your crop or upload an existing image</p>
+              <h3 className="font-semibold text-gray-900 mb-2">Select Crop</h3>
+              <p className="text-gray-600">Choose the type of crop from the dropdown menu</p>
             </div>
             <div className="text-center">
               <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-green-600">2</span>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">AI Analysis</h3>
-              <p className="text-gray-600">Our advanced AI model analyzes the image for pests and diseases</p>
+              <h3 className="font-semibold text-gray-900 mb-2">Upload Image</h3>
+              <p className="text-gray-600">Take a photo of your crop or upload an existing image</p>
             </div>
             <div className="text-center">
               <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-green-600">3</span>
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">Get Results</h3>
-              <p className="text-gray-600">Receive detailed diagnosis and treatment recommendations</p>
+              <p className="text-gray-700">Receive detailed diagnosis and treatment recommendations</p>
             </div>
           </div>
         </div>

@@ -41,7 +41,8 @@ export const AuthProvider = ({ children }) => {
       email,
       password,
       options: {
-        data: userData
+        data: userData,
+        emailConfirm: false // Disable email confirmation
       }
     });
     return { data, error };
