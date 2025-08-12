@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const services = [
   {
@@ -39,9 +40,15 @@ const services = [
 ];
 
 const ServicesTabs = () => {
-  const handleScroll = key => {
-    const el = document.getElementById(`service-${key}`);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const navigate = useNavigate();
+  
+  const handleServiceClick = (key) => {
+    if (key === 'pest') {
+      navigate('/pest-disease-service');
+    } else {
+      const el = document.getElementById(`service-${key}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   return (
@@ -51,7 +58,7 @@ const ServicesTabs = () => {
           {services.map(s => (
             <button
               key={s.key}
-              onClick={() => handleScroll(s.key)}
+              onClick={() => handleServiceClick(s.key)}
               className="flex flex-col items-center gap-2 p-4 rounded-lg hover:bg-green-50 dark:hover:bg-green-900 transition group"
             >
               <span className="group-hover:scale-110 transition-transform">{s.illustration}</span>
