@@ -6,3 +6,15 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Secrets scanning configuration - Choose one of these options:
+
+# Option 1: Ignore specific environment variables (Recommended)
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY,VITE_PEST_DISEASE_API_URL"
+
+# Option 2: Ignore build output directory
+# SECRETS_SCAN_OMIT_PATHS = "dist/**"
+
+# Option 3: Disable secrets scanning entirely (Not recommended for production)
+# SECRETS_SCAN_ENABLED = "false"
