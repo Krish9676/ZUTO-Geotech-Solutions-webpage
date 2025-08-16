@@ -1,70 +1,94 @@
-# ZUTO GeoTech Solutions - Setup Instructions
+# Setup Instructions for Tovi Geotech Solutions
 
 ## Prerequisites
-- Node.js (v16 or higher)
-- npm or yarn
-- Supabase account with database access
-- Your Pest & Disease Classification API endpoint
+- Node.js 16+ and npm
+- Git
+- Supabase account (for authentication and database)
+- Pest Disease Detection API endpoint
 
-## Step 1: Environment Configuration
+## Quick Start
 
-Create a `.env` file in the root directory with your Supabase credentials:
+### 1. Clone and Install
+```bash
+git clone <your-repo-url>
+cd tovi-geotech-solutions
+npm install
+```
 
+### 2. Environment Configuration
+Create a `.env` file in the root directory:
 
+```bash
+# Copy example file (if available)
+cp .env.example .env
+
+# Or create manually
+touch .env
+```
+
+Add your environment variables to `.env`:
+
+```env
+# Supabase Configuration
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
+
+# Pest Disease Detection API
+VITE_PEST_DISEASE_API_URL=https://your-api-endpoint.com
+
+# Optional: Database URL (if using external database)
+DATABASE_URL=your-database-connection-string
+```
+
+### 3. Run Development Server
+```bash
+npm run dev
+```
+
+Visit `http://localhost:5173` in your browser.
+
+## Security Configuration
+
+### Environment Variables
+- **Never commit `.env` files** - They're automatically ignored by `.gitignore`
+- **Use Netlify's environment variable management** for production deployments
+- **Rotate API keys regularly** for security
+
+### Netlify Deployment
+The project includes `netlify.toml` with proper secrets scanning:
+- Secrets scanning is enabled for security
+- Build output directory is excluded from scanning
+- Specific environment variables are excluded from scanning
 
 ## Troubleshooting
 
+### Build Failures
+If you encounter build failures related to secrets scanning:
+
+1. **Check for hardcoded URLs/keys** in your source code
+2. **Ensure all sensitive data** is in environment variables
+3. **Verify `.env` file** is not committed to version control
+4. **Check Netlify configuration** in `netlify.toml`
+
 ### Common Issues
+- **"API URL not configured"**: Set `VITE_PEST_DISEASE_API_URL` in your `.env`
+- **"Supabase not configured"**: Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+- **Build errors**: Ensure all environment variables are properly set
 
-1. **Environment Variables Not Loading**
-   - Ensure `.env` file is in the root directory
-   - Restart the development server after creating `.env`
-
-2. **Database Connection Errors**
-   - Verify Supabase URL and key in `.env`
-   - Check if database schema was created successfully
-
-3. **Image Upload Failures**
-   - Ensure storage buckets are created
-   - Check storage policies are in place
-
-4. **Authentication Issues**
-   - Verify Supabase authentication is enabled
-   - Check if email confirmation is required
-
-### Support
-
-If you encounter issues:
-1. Check the browser console for error messages
-2. Verify all SQL commands executed successfully
-3. Ensure environment variables are correctly set
-4. Check Supabase dashboard for any policy errors
-
-## Deployment
-
-### Vercel
-1. Push code to GitHub
-2. Connect repository to Vercel
-3. Add environment variables in Vercel dashboard
-4. Deploy
+## Production Deployment
 
 ### Netlify
-1. Push code to GitHub
-2. Connect repository to Netlify
-3. Add environment variables in Netlify dashboard
-4. Deploy
+1. Connect your GitHub repository
+2. Set environment variables in Netlify dashboard
+3. Deploy automatically on push to main branch
 
-## Security Notes
+### Vercel
+1. Import your GitHub repository
+2. Set environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
 
-- Environment variables are prefixed with `VITE_` for client-side access
-- Row Level Security (RLS) ensures users can only access their own data
-- Supabase handles authentication securely
-- Images are stored in Supabase Storage with proper access controls
-
-## Next Steps
-
-1. Customize the UI to match your brand
-2. Add more services as needed
-3. Implement additional features like export functionality
-4. Set up monitoring and analytics
-5. Configure backup and recovery procedures
+## Support
+For issues related to:
+- **Environment setup**: Check this document
+- **Build errors**: Check Netlify/Vercel logs
+- **Security concerns**: Review environment variable configuration

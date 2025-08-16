@@ -1,7 +1,13 @@
 // Simple API test script to verify the endpoint is working
 const https = require('https');
 
-const API_BASE_URL = "https://crop-disease-detection-api-0spd.onrender.com";
+// Get API URL from environment variable
+const API_BASE_URL = process.env.VITE_PEST_DISEASE_API_URL || process.env.PEST_DISEASE_API_URL;
+
+if (!API_BASE_URL) {
+  console.error('❌ API URL not configured. Please set VITE_PEST_DISEASE_API_URL or PEST_DISEASE_API_URL environment variable.');
+  process.exit(1);
+}
 
 function testHealthCheck() {
   return new Promise((resolve, reject) => {
@@ -68,7 +74,7 @@ async function main() {
     if (healthOk && docsOk) {
       console.log('\n🎉 API is accessible! You can now test in your React app.');
       console.log('\n📝 Next steps:');
-      console.log('1. Create a .env file with: VITE_PEST_DISEASE_API_URL=https://crop-disease-detection-api-0spd.onrender.com');
+      console.log('1. Create a .env file with: VITE_PEST_DISEASE_API_URL=your_api_url_here');
       console.log('2. Run: npm run dev');
       console.log('3. Test the image upload in your React app');
     } else {

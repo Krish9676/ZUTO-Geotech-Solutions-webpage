@@ -1,11 +1,19 @@
 // Debug script to test the API endpoint
 const https = require('https');
 
-const API_URL = "https://crop-disease-detection-api-0spd.onrender.com/api/upload";
+// Get API URL from environment variable
+const API_URL = process.env.VITE_PEST_DISEASE_API_URL || process.env.PEST_DISEASE_API_URL;
+
+if (!API_URL) {
+  console.error('❌ API URL not configured. Please set VITE_PEST_DISEASE_API_URL or PEST_DISEASE_API_URL environment variable.');
+  process.exit(1);
+}
+
+const FULL_API_URL = `${API_URL}/api/upload`;
 
 function testAPIEndpoint() {
   return new Promise((resolve, reject) => {
-    const req = https.get(API_URL, (res) => {
+    const req = https.get(FULL_API_URL, (res) => {
       console.log(`Status: ${res.statusCode}`);
       console.log(`Headers:`, res.headers);
       

@@ -33,11 +33,40 @@ ZUTO GeoTech Solutions offers a modern, modular, and cost-free AgriTech SaaS pla
    ```sh
    npm install
    ```
-3. **Run locally:**
+3. **Set up environment variables:**
+   ```sh
+   # Copy the example file
+   cp .env.example .env
+   
+   # Edit .env with your actual values
+   VITE_SUPABASE_URL=your_supabase_project_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   VITE_PEST_DISEASE_API_URL=your_pest_disease_api_url
+   ```
+4. **Run locally:**
    ```sh
    npm run dev
    ```
    Visit [http://localhost:5173](http://localhost:5173)
+
+## Security & Environment Variables
+
+### Required Environment Variables
+- `VITE_SUPABASE_URL`: Your Supabase project URL
+- `VITE_SUPABASE_ANON_KEY`: Your Supabase anonymous key
+- `VITE_PEST_DISEASE_API_URL`: Your pest disease detection API endpoint
+
+### Security Best Practices
+- ✅ **Never commit `.env` files** - They're already in `.gitignore`
+- ✅ **Use environment variables** for all sensitive configuration
+- ✅ **Rotate API keys regularly** for production deployments
+- ✅ **Use Netlify's built-in environment variable management** for deployment
+
+### Netlify Deployment
+The project includes `netlify.toml` with proper secrets scanning configuration:
+- Secrets scanning is enabled for security
+- Specific environment variables are excluded from scanning
+- Build output directory is excluded from scanning
 
 ## Deployment
 - Deploy easily to [Vercel](https://vercel.com/) or [Netlify](https://netlify.com/)

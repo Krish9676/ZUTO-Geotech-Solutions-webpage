@@ -78,8 +78,11 @@ const PestDiseaseService = () => {
       formData.append('file', selectedFile);
       formData.append('crop_name', selectedCrop); // Pass the selected crop name
 
-      // Use environment variable if available, otherwise use fallback
-      const baseUrl = import.meta.env.VITE_PEST_DISEASE_API_URL || 'https://crop-disease-detection-api-0spd.onrender.com';
+      // Use environment variable for API URL
+      const baseUrl = import.meta.env.VITE_PEST_DISEASE_API_URL;
+      if (!baseUrl) {
+        throw new Error('API URL not configured. Please set VITE_PEST_DISEASE_API_URL environment variable.');
+      }
       const apiUrl = `${baseUrl}/api/upload`; // Fixed: use /api/upload endpoint
       
       console.log('API URL being called:', apiUrl);
