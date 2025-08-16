@@ -1,20 +1,20 @@
 const AboutSection = () => {
   const stats = [
-    { number: "5", label: "Microservices" },
-    { number: "92%", label: "Model Accuracy" },
-    { number: "24/7", label: "Support" },
-    { number: "100%", label: "Open Source" }
+    { number: "20+", label: "Crop Types Supported" },
+    { number: "94%", label: "Detection Accuracy" },
+    { number: "30%", label: "Cost Reduction" },
+    { number: "40%", label: "Yield Increase" }
   ];
 
   const values = [
     {
       icon: (
         <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
-      title: "Cost-Free Innovation",
-      description: "We believe advanced farming technology should be accessible to all farmers, regardless of scale."
+      title: "Proven Results",
+      description: "Our solutions deliver measurable improvements in crop yields, cost reduction, and market access for farmers worldwide."
     },
     {
       icon: (
@@ -22,27 +22,27 @@ const AboutSection = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
         </svg>
       ),
-      title: "Community-Driven",
-      description: "Built by farmers, for farmers. Our solutions evolve based on real-world feedback and needs."
+      title: "Farmer-Centric Design",
+      description: "Built with real farmers in mind, our solutions address the actual challenges faced in modern agriculture."
     },
     {
       icon: (
         <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
       ),
-      title: "AI-Powered Insights",
-      description: "Leveraging cutting-edge AI to provide actionable insights that improve farming outcomes."
+      title: "Scalable Solutions",
+      description: "From small family farms to large agricultural enterprises, our platform grows with your business needs."
     }
   ];
 
   return (
-    <section id="about" className="py-16 bg-white dark:bg-gray-900">
+    <section id="about" className="py-16 bg-gradient-to-br from-gray-50 to-green-50 dark:from-gray-900 dark:to-gray-800">
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">About Tovi Geotech Solutions</h2>
+          <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">About ZUTO GeoTech Solutions</h2>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            We're revolutionizing agriculture through AI-powered, modular solutions that make advanced farming technology accessible to everyone. Our platform combines cutting-edge machine learning with practical farming needs.
+            We're a forward-thinking AgriTech company dedicated to transforming agriculture through intelligent, data-driven solutions. Our mission is to help farmers increase productivity, reduce costs, and access premium markets through cutting-edge AI technology.
           </p>
         </div>
 
@@ -63,16 +63,34 @@ const AboutSection = () => {
               <div className="flex justify-center mb-4">
                 {value.icon}
               </div>
-              <h3 className="text-xl font-semibold mb-3">{value.title}</h3>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{value.title}</h3>
               <p className="text-gray-600 dark:text-gray-300">{value.description}</p>
             </div>
           ))}
         </div>
 
-        {/* Team/Founder */}
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-8">
+        {/* Company Story */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-8 mb-12 shadow-lg">
           <div className="text-center">
-            <h3 className="text-2xl font-bold mb-4">Meet the Founder</h3>
+            <h3 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Our Story</h3>
+            <div className="max-w-4xl mx-auto text-left space-y-4 text-gray-600 dark:text-gray-300">
+              <p>
+                Founded with a vision to democratize agricultural technology, ZUTO GeoTech Solutions emerged from the recognition that small and medium-scale farmers often lack access to the advanced tools that could significantly improve their operations and profitability.
+              </p>
+              <p>
+                We've developed a comprehensive platform that combines artificial intelligence, computer vision, and data analytics to solve real agricultural challenges. Our solutions are designed to be accessible, affordable, and immediately impactful for farmers of all scales.
+              </p>
+              <p>
+                Today, we serve farmers across multiple regions, helping them increase crop yields, reduce input costs, and access premium markets through our traceability and quality assurance solutions.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Team/Founder */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg">
+          <div className="text-center">
+            <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Leadership</h3>
             <div className="flex flex-col md:flex-row items-center justify-center gap-8">
               <div className="w-32 h-32 rounded-full overflow-hidden">
                 <img 
@@ -82,10 +100,11 @@ const AboutSection = () => {
                 />
               </div>
               <div className="text-left max-w-md">
-                <h4 className="text-xl font-semibold mb-2">Gopi Krishna N</h4>
+                <h4 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Gopi Krishna N</h4>
+                <p className="text-gray-600 dark:text-gray-300 mb-2 font-medium">Founder & CEO</p>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Data Scientist and AgriTech enthusiast with a passion for making advanced farming technology accessible to all. 
-                  Specializing in AI/ML solutions for agriculture.
+                  A passionate entrepreneur and data scientist with deep expertise in AI/ML applications for agriculture. 
+                  Committed to making advanced farming technology accessible and profitable for farmers worldwide.
                 </p>
                 <div className="flex space-x-4">
                   <a href="mailto:gopik8023@gmail.com" className="text-green-600 hover:text-green-700">

@@ -78,11 +78,21 @@ const PestDiseaseService = () => {
       formData.append('file', selectedFile);
       formData.append('crop_name', selectedCrop); // Pass the selected crop name
 
-      const apiUrl = `${import.meta.env.VITE_PEST_DISEASE_API_URL}/upload` || 
-      'https://crop-disease-detection-api-0spd.onrender.com/upload';
+      // Use environment variable if available, otherwise use fallback
+      const baseUrl = import.meta.env.VITE_PEST_DISEASE_API_URL || 'https://crop-disease-detection-api-0spd.onrender.com';
+      const apiUrl = `${baseUrl}/api/upload`; // Fixed: use /api/upload endpoint
+      
+      console.log('API URL being called:', apiUrl);
+      console.log('Environment variable:', import.meta.env.VITE_PEST_DISEASE_API_URL);
+      console.log('FormData contents:', {
+        file: selectedFile.name,
+        crop_name: selectedCrop
+      });
+      
       const response = await fetch(apiUrl, {
         method: 'POST',
         body: formData,
+        // Note: Don't set Content-Type header - let browser set it with boundary for FormData
       });
 
       if (!response.ok) {
@@ -90,13 +100,14 @@ const PestDiseaseService = () => {
       }
 
       const apiResults = await response.json();
+      console.log('API Response:', apiResults);
       
       // Save to database using the new detections table schema
       const { error: dbError } = await supabase
         .from('detections')
         .insert({
           image_url: publicUrl,
-          pest_name: apiResults.pest_name || 'Unknown',
+          pest_name: apiResults.prediction || apiResults.pest_name || 'Unknown', // Use 'prediction' from API
           confidence: apiResults.confidence || 0,
           crop_name: selectedCrop, // Save the selected crop name
           diagnosis: apiResults.diagnosis || 'No diagnosis available',
@@ -258,7 +269,7 @@ const PestDiseaseService = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Pest/Disease:</span>
-                    <span className="font-medium">{results.pest_name || 'Unknown'}</span>
+                    <span className="font-medium">{results.prediction || results.pest_name || 'Unknown'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Confidence:</span>

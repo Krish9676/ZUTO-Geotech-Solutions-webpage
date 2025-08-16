@@ -8,7 +8,6 @@ import ServiceDetail from './components/ServiceDetail';
 import TechnologySection from './components/TechnologySection';
 import LiveDemoWidget from './components/LiveDemoWidget';
 import ApiDocsPreview from './components/ApiDocsPreview';
-import PricingTable from './components/PricingTable';
 import Testimonials from './components/Testimonials';
 import AboutSection from './components/AboutSection';
 import Contact from './components/Contact';
@@ -18,6 +17,8 @@ import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import Dashboard from './components/dashboard/Dashboard';
 import PestDiseaseService from './components/services/PestDiseaseService';
+import GISRemoteSensingSection from './components/GISRemoteSensingSection';
+import GISServiceDetail from './components/GISServiceDetail';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -53,10 +54,10 @@ const LandingPage = () => (
       <Benefits />
       <ProblemsSolved />
       <ServiceDetail />
+      <GISRemoteSensingSection />
       <TechnologySection />
       <LiveDemoWidget />
       <ApiDocsPreview />
-      <PricingTable />
       <Testimonials />
       <AboutSection />
       <Contact />
@@ -91,6 +92,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <PestDiseaseService />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/gis-service/:serviceId" 
+              element={
+                <ProtectedRoute>
+                  <GISServiceDetail />
                 </ProtectedRoute>
               } 
             />

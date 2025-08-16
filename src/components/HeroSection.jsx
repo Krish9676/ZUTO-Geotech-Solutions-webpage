@@ -32,11 +32,11 @@ const HeroSection = () => {
         <div className={`transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-6 drop-shadow-lg">
             <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
-              AI-Powered AgriTech Solutions
+              Smart Farming Solutions
             </span>
             <br />
             <span className="text-white">
-              for the Next Generation of Farming
+              That Drive Real Results
             </span>
           </h1>
         </div>
@@ -44,7 +44,7 @@ const HeroSection = () => {
         <div className={`transform transition-all duration-1000 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <p className="text-lg md:text-2xl lg:text-3xl mb-8 font-medium drop-shadow">
             <span className="bg-gradient-to-r from-yellow-300 to-orange-400 bg-clip-text text-transparent">
-              Modular, cost-free platform with five microservices for pest detection, soil mapping, and traceability
+              Increase crop yields by 20-40%, reduce costs by 30%, and access premium markets with our AI-powered agricultural platform
             </span>
           </p>
         </div>
@@ -56,20 +56,20 @@ const HeroSection = () => {
               className="group bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-4 rounded-lg font-semibold shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
             >
               <span className="flex items-center justify-center">
-                Pest & Disease Service
+                Try Free Demo
                 <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </span>
             </Link>
             <a 
-              href="#api-docs" 
+              href="#contact" 
               className="group bg-white/90 hover:bg-white text-green-800 px-8 py-4 rounded-lg font-semibold shadow-lg border border-green-600 transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
             >
               <span className="flex items-center justify-center">
-                Try Free API
+                Get Started Today
                 <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
               </span>
             </a>

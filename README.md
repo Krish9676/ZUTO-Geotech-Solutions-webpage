@@ -1,9 +1,9 @@
-# Tovi Geotech Solutions
+# ZUTO GeoTech Solutions
 
 AI-Powered AgriTech SaaS Platform
 
 ## Overview
-Tovi Geotech Solutions offers a modern, modular, and cost-free AgriTech SaaS platform. It features five microservices—Pest & Disease ID, Anomaly Detection, Soil Mapping, Traceability, and Weather Risk—built on open-source technology. The platform is designed for scalability, API-first integration, and future-proof agriculture solutions.
+ZUTO GeoTech Solutions offers a modern, modular, and cost-free AgriTech SaaS platform. It features five microservices—Pest & Disease ID, Anomaly Detection, Soil Mapping, Traceability, and Weather Risk—built on open-source technology. The platform is designed for scalability, API-first integration, and future-proof agriculture solutions.
 
 ## Features
 - **Hero Section:** Stunning drone-shot farmland sunrise, bold headline, and CTAs
@@ -26,8 +26,8 @@ Tovi Geotech Solutions offers a modern, modular, and cost-free AgriTech SaaS pla
 ## Getting Started
 1. **Clone the repo:**
    ```sh
-   git clone https://github.com/Krish9676/tovi-geotech-solutions.git
-   cd tovi-geotech-solutions
+   git clone https://github.com/Krish9676/zuto-geotech-solutions.git
+   cd zuto-geotech-solutions
    ```
 2. **Install dependencies:**
    ```sh
@@ -49,4 +49,4 @@ Tovi Geotech Solutions offers a modern, modular, and cost-free AgriTech SaaS pla
 
 ---
 
-© 2025 Tovi Geotech Solutions. All rights reserved.
+© 2025 ZUTO GeoTech Solutions. All rights reserved.

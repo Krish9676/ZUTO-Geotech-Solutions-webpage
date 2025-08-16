@@ -31,7 +31,7 @@ const Footer = () => (
       </div>
     </div>
     <div className="text-center text-xs text-gray-500 dark:text-gray-400 mt-4">
-      &copy; {new Date().getFullYear()} ToviAgriTech. All rights reserved. <a href="#" className="underline ml-2">Privacy Policy</a>
+              &copy; {new Date().getFullYear()} ZUTO GeoTech. All rights reserved. <a href="#" className="underline ml-2">Privacy Policy</a>
     </div>
   </footer>
 );

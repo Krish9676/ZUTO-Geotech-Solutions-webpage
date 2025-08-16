@@ -37,6 +37,13 @@ const services = [
       <svg className="w-12 h-12" viewBox="0 0 48 48" fill="none"><ellipse cx="24" cy="32" rx="16" ry="8" fill="#60a5fa"/><ellipse cx="24" cy="24" rx="10" ry="4" fill="#fbbf24"/><ellipse cx="24" cy="16" rx="6" ry="2" fill="#fff"/></svg>
     ),
   },
+  {
+    key: 'gis',
+    label: 'GIS & Remote Sensing',
+    illustration: (
+      <svg className="w-12 h-12" viewBox="0 0 48 48" fill="none"><rect x="8" y="8" width="32" height="32" rx="4" fill="#8b5cf6"/><path d="M16 16h16v4H16zM16 24h16v4H16zM16 32h12v4H16z" fill="#fff"/></svg>
+    ),
+  },
 ];
 
 const ServicesTabs = () => {
@@ -45,6 +52,10 @@ const ServicesTabs = () => {
   const handleServiceClick = (key) => {
     if (key === 'pest') {
       navigate('/pest-disease-service');
+    } else if (key === 'gis') {
+      // Scroll to GIS section
+      const el = document.querySelector('[data-section="gis-remote-sensing"]');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
       const el = document.getElementById(`service-${key}`);
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });

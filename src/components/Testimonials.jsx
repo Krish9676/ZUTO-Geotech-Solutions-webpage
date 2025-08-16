@@ -1,6 +1,6 @@
 const testimonials = [
   {
-    quote: 'ToviAgriTech helped us identify crop issues before they spread. The free tier is a game changer!',
+    quote: 'ZUTO GeoTech helped us identify crop issues before they spread. The free tier is a game changer!',
     name: 'Ravi Kumar',
     farm: 'GreenFields Farm',
     img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=200&q=80',

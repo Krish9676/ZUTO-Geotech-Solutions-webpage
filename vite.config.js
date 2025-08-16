@@ -4,5 +4,5 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   // Uncomment the next line if deploying to a subpath
-  // base: '/tovi-geotech-solutions/',
+  // base: '/zuto-geotech-solutions/',
 });

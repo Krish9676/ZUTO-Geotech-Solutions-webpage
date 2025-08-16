@@ -47,7 +47,7 @@ const ChatWidget = () => {
         <div className="fixed bottom-24 right-6 w-80 h-96 bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 flex flex-col">
           {/* Header */}
           <div className="bg-green-600 text-white p-4 rounded-t-lg">
-            <h3 className="font-semibold">ToviAgriTech Support</h3>
+            <h3 className="font-semibold">ZUTO GeoTech Support</h3>
             <p className="text-sm opacity-90">Ask us anything!</p>
           </div>
 
