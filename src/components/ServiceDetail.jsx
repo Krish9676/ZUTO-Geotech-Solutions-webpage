@@ -82,39 +82,39 @@ const services = [
 ];
 
 const ServiceDetail = () => (
-  <section id="solutions" className="py-16 bg-white dark:bg-gray-900">
-    <div className="max-w-6xl mx-auto px-4">
-      <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold mb-4">Our Agricultural Solutions</h2>
-        <p className="text-lg text-gray-600 dark:text-gray-300">
+  <section id="solutions" className="py-12 bg-white dark:bg-gray-900">
+    <div className="max-w-7xl mx-auto px-4">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold mb-3">Our Agricultural Solutions</h2>
+        <p className="text-base text-gray-600 dark:text-gray-300">
           Comprehensive AI-powered tools designed to solve real farming challenges and drive business growth
         </p>
       </div>
       
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-5 gap-4">
         {services.map(service => (
-          <div key={service.key} className="bg-gray-50 dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-            <img src={service.img} alt={service.title} className="w-full h-48 object-cover" />
-            <div className="p-6">
-              <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">{service.description}</p>
+          <div key={service.key} className="bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+            <img src={service.img} alt={service.title} className="w-full h-32 object-cover" />
+            <div className="p-4">
+              <h3 className="text-sm font-semibold mb-2">{service.title}</h3>
+              <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">{service.description}</p>
               
-              <div className="mb-4">
-                <h4 className="font-medium text-gray-900 dark:text-white mb-2">Key Features:</h4>
-                <ul className="space-y-2">
-                  {service.features.map((feature, i) => (
+              <div className="mb-3">
+                <h4 className="font-medium text-gray-900 dark:text-white mb-2 text-xs">Key Features:</h4>
+                <ul className="space-y-1">
+                  {service.features.slice(0, 3).map((feature, i) => (
                     <li key={i} className="flex items-start">
-                      <svg className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-3 h-3 text-green-500 mr-1 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-sm text-gray-600 dark:text-gray-300">{feature}</span>
+                      <span className="text-xs text-gray-600 dark:text-gray-300">{feature}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg mb-4">
-                <p className="text-sm text-green-800 dark:text-green-200">
+              <div className="bg-green-50 dark:bg-green-900/20 p-2 rounded mb-3">
+                <p className="text-xs text-green-800 dark:text-green-200">
                   <span className="font-semibold">Business Impact:</span> {service.businessValue}
                 </p>
               </div>
@@ -122,7 +122,7 @@ const ServiceDetail = () => (
               <div className="text-center">
                 <a 
                   href={service.demoLink} 
-                  className="inline-block bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                  className="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded text-xs font-medium transition-colors"
                 >
                   {service.cta}
                 </a>

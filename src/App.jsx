@@ -3,12 +3,10 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import Benefits from './components/Benefits';
-import ProblemsSolved from './components/ProblemsSolved';
 import ServiceDetail from './components/ServiceDetail';
 import TechnologySection from './components/TechnologySection';
 import LiveDemoWidget from './components/LiveDemoWidget';
 import ApiDocsPreview from './components/ApiDocsPreview';
-import Testimonials from './components/Testimonials';
 import AboutSection from './components/AboutSection';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
@@ -52,14 +50,17 @@ const LandingPage = () => (
     <main>
       <HeroSection />
       <Benefits />
-      <ProblemsSolved />
       <ServiceDetail />
       <GISRemoteSensingSection />
-      <TechnologySection />
-      <LiveDemoWidget />
+      <div className="bg-gray-100 dark:bg-gray-800">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="grid md:grid-cols-2 gap-8">
+            <TechnologySection />
+            <AboutSection />
+          </div>
+        </div>
+      </div>
       <ApiDocsPreview />
-      <Testimonials />
-      <AboutSection />
       <Contact />
     </main>
     <Footer />
