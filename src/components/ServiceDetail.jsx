@@ -91,7 +91,7 @@ const ServiceDetail = () => (
         </p>
       </div>
       
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         {services.map(service => (
           <div key={service.key} className="bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
             <img src={service.img} alt={service.title} className="w-full h-32 object-cover" />

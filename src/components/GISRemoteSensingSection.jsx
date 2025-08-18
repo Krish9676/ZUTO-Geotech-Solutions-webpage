@@ -63,7 +63,7 @@ const GISRemoteSensingSection = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {gisServices.map(service => (
             <div key={service.id} className="bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
               <div className="p-4">

@@ -101,7 +101,7 @@ const TechnologySection = () => {
         <p className="text-xs text-gray-600 dark:text-gray-400 text-center mb-4">
           Experience cutting-edge technology that transforms farming operations
         </p>
-        <div className="grid md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {aiFeatures.map((feature, index) => (
             <div key={index} className="text-center">
               <div className="flex justify-center mb-2">
@@ -114,7 +114,7 @@ const TechnologySection = () => {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         {techStack.map((category, index) => (
           <div key={index} className="bg-gray-50 dark:bg-gray-600 rounded-lg p-3 shadow-sm">
             <h3 className="text-xs font-medium mb-2 text-gray-800 dark:text-gray-200">{category.category}</h3>
@@ -133,7 +133,7 @@ const TechnologySection = () => {
       {/* Integration Use Cases */}
       <div className="border-t border-gray-200 dark:border-gray-600 pt-4">
         <h3 className="text-sm font-semibold mb-3 text-gray-800 dark:text-gray-200 text-center">Integration Use Cases</h3>
-        <div className="grid md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {integrationUseCases.map((useCase, index) => (
             <div key={index} className="text-center">
               <div className="flex justify-center mb-2">
