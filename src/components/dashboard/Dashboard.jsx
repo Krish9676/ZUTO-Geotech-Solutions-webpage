@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
+import { cropDiseaseAPI } from '../../lib/api';
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
@@ -9,6 +10,7 @@ const Dashboard = () => {
   const [detections, setDetections] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [apiStatus, setApiStatus] = useState({ status: 'checking', message: 'Checking API...' });
 
   useEffect(() => {
     fetchUserData();
@@ -40,6 +42,23 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+
+  const checkAPIStatus = async () => {
+    try {
+      const statusResponse = await cropDiseaseAPI.checkStatus();
+      if (statusResponse.success) {
+        setApiStatus({ status: 'ready', message: statusResponse.message });
+      } else {
+        setApiStatus({ status: 'error', message: statusResponse.error });
+      }
+    } catch (error) {
+      setApiStatus({ status: 'error', message: 'Failed to check API status' });
+    }
+  };
+
+  useEffect(() => {
+    checkAPIStatus();
+  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -139,6 +158,62 @@ const Dashboard = () => {
                 <p className="text-2xl font-semibold text-gray-900">{stats?.avg_confidence || 0}%</p>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* API Status */}
+        <div className="bg-white rounded-lg shadow p-6 mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">API Status</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center p-4 border-2 border-gray-200 rounded-lg">
+              <div className={`p-2 rounded-lg mr-3 ${
+                apiStatus.status === 'ready' ? 'bg-green-100' : 
+                apiStatus.status === 'error' ? 'bg-red-100' : 'bg-yellow-100'
+              }`}>
+                <svg className={`w-6 h-6 ${
+                  apiStatus.status === 'ready' ? 'text-green-600' : 
+                  apiStatus.status === 'error' ? 'text-red-600' : 'text-yellow-600'
+                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {apiStatus.status === 'ready' ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  ) : apiStatus.status === 'error' ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  )}
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">API Status</p>
+                <p className={`text-lg font-semibold ${
+                  apiStatus.status === 'ready' ? 'text-green-900' : 
+                  apiStatus.status === 'error' ? 'text-red-900' : 'text-yellow-900'
+                }`}>
+                  {apiStatus.status === 'ready' ? 'Ready' : 
+                   apiStatus.status === 'error' ? 'Error' : 'Checking...'}
+                </p>
+                <p className="text-sm text-gray-500">{apiStatus.message}</p>
+              </div>
+            </div>
+            <div className="flex items-center p-4 border-2 border-gray-200 rounded-lg">
+              <div className="p-2 bg-blue-100 rounded-lg mr-3">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Response Time</p>
+                <p className="text-lg font-semibold text-gray-900">~2-5s</p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 text-right">
+            <button
+              onClick={checkAPIStatus}
+              className="text-sm text-blue-600 hover:text-blue-800 underline"
+            >
+              Refresh Status
+            </button>
           </div>
         </div>
 

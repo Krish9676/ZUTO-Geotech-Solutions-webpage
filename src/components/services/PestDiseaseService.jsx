@@ -2,6 +2,8 @@ import { useState, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
+import { cropDiseaseAPI } from '../../lib/api';
+import { API_CONFIG, validateFile } from '../../config/api';
 
 const PestDiseaseService = () => {
   const { user } = useAuth();
@@ -14,19 +16,12 @@ const PestDiseaseService = () => {
   const [selectedCrop, setSelectedCrop] = useState(''); // New state for selected crop
   const fileInputRef = useRef(null);
 
-  // List of crops from the provided image
-  const cropList = [
-    'Rice', 'Maize', 'Onion', 'Cotton', 'Chilli', 'Potato', 'Wheat', 'Mustard',
-    'Sugarcane', 'Tobacco', 'Soyabean', 'Tomato', 'Mango', 'Banana', 'Papaya',
-    'Pomegranate', 'Oranges', 'Grapes', 'Cabbage', 'Cauliflower', 'Brinjal'
-  ];
+  // List of crops from the configuration
+  const cropList = API_CONFIG.SUPPORTED_CROPS;
 
   const handleFileSelect = (file) => {
-    if (file && file.type.startsWith('image/')) {
-      if (file.size > 10 * 1024 * 1024) { // 10MB limit
-        setError('File size must be less than 10MB');
-        return;
-      }
+    try {
+      validateFile(file);
       setSelectedFile(file);
       setError(null);
       
@@ -34,8 +29,8 @@ const PestDiseaseService = () => {
       const reader = new FileReader();
       reader.onload = (e) => setPreview(e.target.result);
       reader.readAsDataURL(file);
-    } else {
-      setError('Please select a valid image file');
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -60,60 +55,26 @@ const PestDiseaseService = () => {
     setError(null);
 
     try {
-      // Upload image to Supabase Storage
-      const fileName = `${Date.now()}-${selectedFile.name}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('crop-images')
-        .upload(fileName, selectedFile);
-
-      if (uploadError) throw uploadError;
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('crop-images')
-        .getPublicUrl(fileName);
-
-      // Call your API
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      formData.append('crop_name', selectedCrop); // Pass the selected crop name
-
-      // Use environment variable for API URL
-      const baseUrl = import.meta.env.VITE_PEST_DISEASE_API_URL;
-      if (!baseUrl) {
-        throw new Error('API URL not configured. Please set VITE_PEST_DISEASE_API_URL environment variable.');
-      }
-      const apiUrl = `${baseUrl}/api/upload`; // Fixed: use /api/upload endpoint
+      // Call the FastAPI backend directly
+      const apiResponse = await cropDiseaseAPI.analyzeImage(selectedFile, selectedCrop);
+      console.log('API Response:', apiResponse);
       
-      console.log('API URL being called:', apiUrl);
-      console.log('Environment variable:', import.meta.env.VITE_PEST_DISEASE_API_URL);
-      console.log('FormData contents:', {
-        file: selectedFile.name,
-        crop_name: selectedCrop
-      });
-      
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        body: formData,
-        // Note: Don't set Content-Type header - let browser set it with boundary for FormData
-      });
-
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`);
+      if (!apiResponse.success) {
+        throw new Error(apiResponse.error || 'Failed to analyze image');
       }
-
-      const apiResults = await response.json();
-      console.log('API Response:', apiResults);
+      
+      const apiResults = apiResponse.data;
       
       // Save to database using the new detections table schema
       const { error: dbError } = await supabase
         .from('detections')
         .insert({
-          image_url: publicUrl,
-          pest_name: apiResults.prediction || apiResults.pest_name || 'Unknown', // Use 'prediction' from API
-          confidence: apiResults.confidence || 0,
-          crop_name: selectedCrop, // Save the selected crop name
-          diagnosis: apiResults.diagnosis || 'No diagnosis available',
+          image_url: apiResults.image_url,
+          heatmap_url: apiResults.heatmap_url,
+          pest_name: apiResults.prediction,
+          confidence: apiResults.confidence,
+          crop_name: selectedCrop,
+          diagnosis: apiResults.diagnosis,
           created_by: user.id
         });
 
@@ -262,7 +223,7 @@ const PestDiseaseService = () => {
           <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Analysis Results</h2>
             
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-3">Detection Details</h3>
                 <div className="space-y-3">
@@ -272,11 +233,11 @@ const PestDiseaseService = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Pest/Disease:</span>
-                    <span className="font-medium">{results.prediction || results.pest_name || 'Unknown'}</span>
+                    <span className="font-medium">{results.prediction}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Confidence:</span>
-                    <span className="font-medium">{results.confidence || 0}%</span>
+                    <span className="font-medium">{results.confidence}%</span>
                   </div>
                 </div>
               </div>
@@ -289,14 +250,34 @@ const PestDiseaseService = () => {
               </div>
             </div>
 
-            {results.recommendations && (
-              <div className="mt-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-3">Recommendations</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-700">
-                  {results.recommendations.map((rec, index) => (
-                    <li key={index}>{rec}</li>
-                  ))}
-                </ul>
+            {/* Heatmap Display */}
+            {results.heatmap_url && (
+              <div className="mb-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-3">AI Analysis Heatmap</h3>
+                <div className="text-center">
+                  <img
+                    src={results.heatmap_url}
+                    alt="AI Analysis Heatmap"
+                    className="max-w-md mx-auto rounded-lg shadow-md"
+                  />
+                  <p className="text-sm text-gray-500 mt-2">
+                    This heatmap shows the areas the AI focused on for detection
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Original Image */}
+            {results.image_url && (
+              <div className="mb-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-3">Original Image</h3>
+                <div className="text-center">
+                  <img
+                    src={results.image_url}
+                    alt="Original Crop Image"
+                    className="max-w-md mx-auto rounded-lg shadow-md"
+                  />
+                </div>
               </div>
             )}
           </div>

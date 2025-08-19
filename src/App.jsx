@@ -105,6 +105,9 @@ function App() {
               } 
             />
             
+            {/* API Documentation Route */}
+            <Route path="/api-docs" element={<ApiDocsPreview />} />
+            
             {/* Catch all route */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
