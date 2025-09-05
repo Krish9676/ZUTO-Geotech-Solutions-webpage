@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
-import Benefits from './components/Benefits';
 import ServiceDetail from './components/ServiceDetail';
 import TechnologySection from './components/TechnologySection';
 import LiveDemoWidget from './components/LiveDemoWidget';
@@ -49,7 +48,6 @@ const LandingPage = () => (
     <Navbar />
     <main>
       <HeroSection />
-      <Benefits />
       <ServiceDetail />
       <GISRemoteSensingSection />
       <div className="bg-gray-100 dark:bg-gray-800">

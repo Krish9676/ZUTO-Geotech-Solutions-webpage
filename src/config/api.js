@@ -8,6 +8,7 @@ export const API_CONFIG = {
     UPLOAD: '/api/upload',
     HISTORY: '/api/history',
     DETECTION: '/api/detections',
+    CROPS: '/api/crops',
     HEALTH: '/health',
     READY: '/ready'
   },
@@ -21,11 +22,11 @@ export const API_CONFIG = {
   // Maximum file size (10MB)
   MAX_FILE_SIZE: 10 * 1024 * 1024,
   
-  // Crop types supported by the model
+  // Crop types supported by the new crop-aware multicrop model (21 crops)
   SUPPORTED_CROPS: [
-    'Rice', 'Maize', 'Onion', 'Cotton', 'Chilli', 'Potato', 'Wheat', 'Mustard',
-    'Sugarcane', 'Tobacco', 'Soyabean', 'Tomato', 'Mango', 'Banana', 'Papaya',
-    'Pomegranate', 'Oranges', 'Grapes', 'Cabbage', 'Cauliflower', 'Brinjal'
+    'banana', 'brinjal', 'cabbage', 'cauliflower', 'chilli', 'cotton', 'grapes', 
+    'maize', 'mango', 'mustard', 'onion', 'oranges', 'papaya', 'pomegranade', 
+    'potato', 'rice', 'soyabean', 'sugarcane', 'tobacco', 'tomato', 'wheat'
   ]
 };
 

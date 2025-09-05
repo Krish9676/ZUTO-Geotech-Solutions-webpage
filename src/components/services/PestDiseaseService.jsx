@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
@@ -14,10 +14,37 @@ const PestDiseaseService = () => {
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
   const [selectedCrop, setSelectedCrop] = useState(''); // New state for selected crop
+  const [cropList, setCropList] = useState([]); // State for crops from API
+  const [loadingCrops, setLoadingCrops] = useState(true);
   const fileInputRef = useRef(null);
 
-  // List of crops from the configuration
-  const cropList = API_CONFIG.SUPPORTED_CROPS;
+  // Helper function to format crop names for display
+  const formatCropName = (crop) => {
+    return crop.charAt(0).toUpperCase() + crop.slice(1).replace(/_/g, ' ');
+  };
+
+  // Load crops from API on component mount
+  useEffect(() => {
+    const loadCrops = async () => {
+      try {
+        const response = await cropDiseaseAPI.getCrops();
+        if (response.success) {
+          setCropList(response.data);
+        } else {
+          // Fallback to static list if API fails
+          setCropList(API_CONFIG.SUPPORTED_CROPS);
+        }
+      } catch (error) {
+        console.error('Failed to load crops from API:', error);
+        // Fallback to static list
+        setCropList(API_CONFIG.SUPPORTED_CROPS);
+      } finally {
+        setLoadingCrops(false);
+      }
+    };
+
+    loadCrops();
+  }, []);
 
   const handleFileSelect = (file) => {
     try {
@@ -138,15 +165,23 @@ const PestDiseaseService = () => {
               id="crop-select"
               value={selectedCrop}
               onChange={(e) => setSelectedCrop(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              disabled={loadingCrops}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <option value="">-- Please select a crop --</option>
+              <option value="">
+                {loadingCrops ? 'Loading crops...' : '-- Please select a crop --'}
+              </option>
               {cropList.map((crop) => (
                 <option key={crop} value={crop}>
-                  {crop}
+                  {formatCropName(crop)}
                 </option>
               ))}
             </select>
+            {loadingCrops && (
+              <p className="text-sm text-gray-500 mt-2">
+                Loading available crops from the API...
+              </p>
+            )}
           </div>
         </div>
 
@@ -229,7 +264,7 @@ const PestDiseaseService = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Crop:</span>
-                    <span className="font-medium">{selectedCrop}</span>
+                    <span className="font-medium">{formatCropName(selectedCrop)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Pest/Disease:</span>
@@ -291,21 +326,33 @@ const PestDiseaseService = () => {
                 <span className="text-2xl font-bold text-green-600">1</span>
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">Select Crop</h3>
-              <p className="text-gray-600">Choose the type of crop from the dropdown menu</p>
+              <p className="text-gray-600">Choose from 21 supported crop types using our crop-aware AI model</p>
             </div>
             <div className="text-center">
               <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-green-600">2</span>
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">Upload Image</h3>
-              <p className="text-gray-600">Take a photo of your crop or upload an existing image</p>
+              <p className="text-gray-600">Take a photo of your crop or upload an existing image (160x160px optimized)</p>
             </div>
             <div className="text-center">
               <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-green-600">3</span>
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">Get Results</h3>
-              <p className="text-gray-700">Receive detailed diagnosis and treatment recommendations</p>
+              <p className="text-gray-700">Receive crop-specific disease predictions with 15 disease classes per crop</p>
+            </div>
+          </div>
+          
+          <div className="mt-8 p-4 bg-green-50 rounded-lg">
+            <h3 className="text-lg font-semibold text-green-800 mb-2">New Crop-Aware Model Features</h3>
+            <div className="grid md:grid-cols-2 gap-4 text-sm text-green-700">
+              <div>
+                <p><strong>21 Crops Supported:</strong> banana, brinjal, cabbage, cauliflower, chilli, cotton, grapes, maize, mango, mustard, onion, oranges, papaya, pomegranade, potato, rice, soyabean, sugarcane, tobacco, tomato, wheat</p>
+              </div>
+              <div>
+                <p><strong>15 Disease Classes per Crop:</strong> healthy, bacterial_blight, anthracnose, leaf_spot, rust, verticillium_wilt, fusarium_wilt, leaf_curl, mosaic_virus, leaf_mold, early_blight, late_blight, root_rot, alternaria_blight, phomopsis_blight</p>
+              </div>
             </div>
           </div>
         </div>

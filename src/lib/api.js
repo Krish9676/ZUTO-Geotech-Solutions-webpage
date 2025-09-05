@@ -164,6 +164,33 @@ class CropDiseaseAPI {
             };
         }
     }
+
+    /**
+     * Get available crops from the API
+     * @returns {Promise<Object>} List of available crops
+     */
+    async getCrops() {
+        try {
+            const response = await fetch(`${this.apiURL}/crops`);
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+            }
+
+            const crops = await response.json();
+            return {
+                success: true,
+                data: crops
+            };
+
+        } catch (error) {
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
 }
 
 // Create and export a singleton instance
