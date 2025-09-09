@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+
 const services = [
   {
     key: 'pest',
@@ -14,74 +17,88 @@ const services = [
     businessValue: 'Prevent up to 80% of crop losses and reduce pesticide costs by 30%',
     cta: 'Try Demo',
     demoLink: '/pest-disease-service'
-  },
-  {
-    key: 'anomaly',
-    title: 'Crop Health Monitoring',
-    img: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=600&q=80',
-    description: 'Continuous monitoring and early warning system for crop health issues',
-    features: [
-      'Real-time crop health monitoring',
-      'Early warning alerts for potential issues',
-      'Weather impact assessment',
-      'Growth stage tracking and optimization',
-      'Automated reporting and insights'
-    ],
-    businessValue: 'Optimize crop management and increase yields by 20-40%',
-    cta: 'Learn More',
-    demoLink: '#'
-  },
-  {
-    key: 'soil',
-    title: 'Soil Analysis & Mapping',
-    img: 'https://images.unsplash.com/photo-1501876725168-00c445821c9e?auto=format&fit=crop&w=600&q=80',
-    description: 'Comprehensive soil health assessment and precision mapping solutions',
-    features: [
-      'Soil composition and nutrient analysis',
-      'Precision mapping for variable rate application',
-      'Fertilizer optimization recommendations',
-      'Soil health trend monitoring',
-      'Export to farm management software'
-    ],
-    businessValue: 'Reduce fertilizer costs by 25% and improve soil health long-term',
-    cta: 'Learn More',
-    demoLink: '#'
-  },
-  {
-    key: 'trace',
-    title: 'Supply Chain Traceability',
-    img: 'https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=600&q=80',
-    description: 'End-to-end traceability from farm to consumer with blockchain verification',
-    features: [
-      'QR code tracking for every product batch',
-      'Blockchain-verified authenticity',
-      'Quality certification and compliance',
-      'Consumer transparency and trust',
-      'Export documentation automation'
-    ],
-    businessValue: 'Access premium markets with 15-25% higher pricing',
-    cta: 'Learn More',
-    demoLink: '#'
-  },
-  {
-    key: 'weather',
-    title: 'Weather Risk Management',
-    img: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80',
-    description: 'Advanced weather forecasting and risk assessment for agricultural planning',
-    features: [
-      'Hyperlocal weather forecasting',
-      'Risk assessment and mitigation planning',
-      'Crop-specific weather alerts',
-      'Insurance and financial planning support',
-      'Historical weather pattern analysis'
-    ],
-    businessValue: 'Minimize weather-related losses and optimize planting schedules',
-    cta: 'Learn More',
-    demoLink: '#'
-  },
+  }
 ];
 
-const ServiceDetail = () => (
+const gisAnalysisTypes = [
+  {
+    id: 'vegetation',
+    title: 'Vegetation Analysis',
+    description: 'Advanced vegetation health monitoring using NDVI, EVI, RENDVI and other indices for crop monitoring and forest assessment.',
+    indices: ['NDVI', 'EVI', 'RENDVI', 'SAVI'],
+    impact: 'Improve crop monitoring accuracy by 25-40% and enable early stress detection',
+    color: 'green',
+    icon: '🌱'
+  },
+  {
+    id: 'water',
+    title: 'Water & Moisture Mapping',
+    description: 'Comprehensive water body detection, wetland mapping, and moisture stress assessment for agricultural and environmental monitoring.',
+    indices: ['NDWI', 'MNDWI', 'NDMI', 'NMDI'],
+    impact: 'Optimize irrigation management and reduce water waste by 30-50%',
+    color: 'blue',
+    icon: '💧'
+  },
+  {
+    id: 'soil',
+    title: 'Soil & Agricultural Assessment',
+    description: 'Soil property mapping, tillage monitoring, and agricultural land classification using advanced spectral indices.',
+    indices: ['BSI', 'NDTI', 'PSRI', 'CRI'],
+    impact: 'Reduce fertilizer costs by 20-35% through precision soil mapping',
+    color: 'amber',
+    icon: '🌾'
+  },
+  {
+    id: 'urban',
+    title: 'Urban & Built-up Mapping',
+    description: 'Urban expansion monitoring, built-up area extraction, and infrastructure development tracking for city planning.',
+    indices: ['NDBI', 'IBI', 'BAEI', 'EBBI'],
+    impact: 'Enable accurate urban planning and infrastructure development tracking',
+    color: 'gray',
+    icon: '🏙️'
+  },
+  {
+    id: 'hazard',
+    title: 'Hazard & Fire Assessment',
+    description: 'Fire severity mapping, burned area assessment, and post-fire recovery monitoring for disaster management.',
+    indices: ['NBR', 'dNBR', 'BAI', 'NDDI'],
+    impact: 'Improve disaster response and recovery planning efficiency by 40-60%',
+    color: 'red',
+    icon: '🔥'
+  },
+  {
+    id: 'nutrient',
+    title: 'Nutrient & Fertility Analysis',
+    description: 'Advanced nutrient deficiency detection, chlorophyll estimation, and soil fertility assessment using red-edge bands.',
+    indices: ['CIred-edge', 'TGI', 'SI', 'NDSI'],
+    impact: 'Increase crop yields by 15-30% through precision nutrient management',
+    color: 'purple',
+    icon: '🧪'
+  }
+];
+
+const getColorClasses = (color) => {
+  const colorMap = {
+    green: 'from-green-500 to-green-600 bg-green-100 text-green-800 border-green-200',
+    blue: 'from-blue-500 to-blue-600 bg-blue-100 text-blue-800 border-blue-200',
+    amber: 'from-amber-500 to-amber-600 bg-amber-100 text-amber-800 border-amber-200',
+    gray: 'from-gray-500 to-gray-600 bg-gray-100 text-gray-800 border-gray-200',
+    red: 'from-red-500 to-red-600 bg-red-100 text-red-800 border-red-200',
+    purple: 'from-purple-500 to-purple-600 bg-purple-100 text-purple-800 border-purple-200'
+  };
+  return colorMap[color] || colorMap.green;
+};
+
+const ServiceDetail = () => {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('vegetation');
+
+  const handleAnalysis = async (type) => {
+    // Navigate to the dedicated analysis page
+    navigate(`/gis-analysis/${type}`);
+  };
+
+  return (
   <section id="solutions" className="py-12 bg-white dark:bg-gray-900">
     <div className="max-w-7xl mx-auto px-4">
       <div className="text-center mb-8">
@@ -91,48 +108,133 @@ const ServiceDetail = () => (
         </p>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-        {services.map(service => (
-          <div key={service.key} className="bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-            <img src={service.img} alt={service.title} className="w-full h-32 object-cover" />
-            <div className="p-4">
-              <h3 className="text-sm font-semibold mb-2">{service.title}</h3>
-              <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">{service.description}</p>
-              
-              <div className="mb-3">
-                <h4 className="font-medium text-gray-900 dark:text-white mb-2 text-xs">Key Features:</h4>
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Pest & Disease Detection Service - Header style */}
+        <div className="lg:col-span-1">
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 h-full">
+            <div className="text-center mb-4">
+              <h2 className="text-lg font-bold text-gray-900 mb-2">
+                Pest & Disease Detection
+              </h2>
+              <p className="text-xs text-gray-600">
+                AI-powered identification of crop pests and diseases from smartphone photos with advanced machine learning algorithms for precision agriculture.
+              </p>
+            </div>
+
+            {/* Key Features Grid */}
+            <div className="grid grid-cols-1 gap-2 mb-4">
+              <div className="bg-white rounded-lg shadow-sm p-2">
+                <h4 className="font-medium text-gray-900 mb-1 text-xs">Key Features:</h4>
                 <ul className="space-y-1">
-                  {service.features.slice(0, 3).map((feature, i) => (
+                  {services[0].features.map((feature, i) => (
                     <li key={i} className="flex items-start">
-                      <svg className="w-3 h-3 text-green-500 mr-1 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-2 h-2 text-green-500 mr-1 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-xs text-gray-600 dark:text-gray-300">{feature}</span>
+                      <span className="text-xs text-gray-600">{feature}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="bg-green-50 dark:bg-green-900/20 p-2 rounded mb-3">
-                <p className="text-xs text-green-800 dark:text-green-200">
-                  <span className="font-semibold">Business Impact:</span> {service.businessValue}
-                </p>
+              <div className="bg-white rounded-lg shadow-sm p-2">
+                <h4 className="font-medium text-gray-900 mb-1 text-xs">Supported Crops:</h4>
+                <p className="text-xs text-gray-600">21+ major crops including rice, wheat, maize, tomato, potato, and more</p>
               </div>
 
-              <div className="text-center">
-                <a 
-                  href={service.demoLink} 
-                  className="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded text-xs font-medium transition-colors"
-                >
-                  {service.cta}
-                </a>
+              <div className="bg-white rounded-lg shadow-sm p-2">
+                <h4 className="font-medium text-gray-900 mb-1 text-xs">Disease Classes:</h4>
+                <p className="text-xs text-gray-600">15 disease classes per crop with 95%+ accuracy</p>
+              </div>
+
+              <div className="bg-green-50 rounded-lg p-2">
+                <h4 className="font-medium text-green-800 mb-1 text-xs">Business Impact:</h4>
+                <p className="text-xs text-green-700">{services[0].businessValue}</p>
               </div>
             </div>
+
+            <div className="text-center">
+              <a 
+                href={services[0].demoLink} 
+                className="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-xs font-medium transition-colors"
+              >
+                {services[0].cta}
+              </a>
+            </div>
           </div>
-        ))}
+        </div>
+
+        {/* GIS & Remote Sensing Solutions Section - Takes up 2/3 of the width */}
+        <div className="lg:col-span-2 bg-gradient-to-br from-slate-50 to-blue-50 rounded-lg p-4">
+          <div className="text-center mb-4">
+            <h2 className="text-lg font-bold text-gray-900 mb-2">
+              GIS & Remote Sensing Solutions
+            </h2>
+            <p className="text-xs text-gray-600">
+              Advanced satellite imagery analysis using cutting-edge spectral indices for precision agriculture, 
+              environmental monitoring, and urban planning applications.
+            </p>
+          </div>
+
+          {/* Analysis Types Grid - 3 columns, 2 rows */}
+          <div className="grid grid-cols-3 gap-2">
+            {gisAnalysisTypes.map((type) => (
+              <div
+                key={type.id}
+                className={`bg-white rounded-lg shadow-md p-2 hover:shadow-lg transition-all duration-300 border h-full cursor-pointer ${
+                  activeTab === type.id ? 'border-blue-500 ring-1 ring-blue-200' : 'border-gray-200'
+                }`}
+                onClick={() => setActiveTab(type.id)}
+              >
+                <div className="flex flex-col items-center text-center mb-2">
+                  <span className="text-xl mb-1">{type.icon}</span>
+                  <h3 className="text-xs font-semibold text-gray-900 leading-tight">{type.title}</h3>
+                </div>
+                
+                <p className="text-gray-600 mb-2 text-xs leading-tight text-center">{type.description}</p>
+                
+                <div className="mb-2">
+                  <h4 className="font-medium text-gray-900 mb-1 text-xs text-center">Key Indices:</h4>
+                  <div className="flex flex-wrap gap-1 justify-center">
+                    {type.indices.map((index) => (
+                      <span
+                        key={index}
+                        className={`px-1.5 py-0.5 rounded-full text-xs font-medium ${getColorClasses(type.color).split(' ')[1]}`}
+                      >
+                        {index}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="mb-2">
+                  <h4 className="font-medium text-gray-900 mb-1 text-xs text-center">Business Impact:</h4>
+                  <p className="text-xs text-gray-600 text-center leading-tight">{type.impact}</p>
+                </div>
+                
+                <div className="flex justify-center">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAnalysis(type.id);
+                    }}
+                    className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium text-white bg-gradient-to-r ${getColorClasses(type.color).split(' ').slice(0, 2).join(' ')} hover:shadow-sm transition-all duration-200`}
+                  >
+                    Analyze
+                    <svg className="ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
-);
+  );
+};
 
 export default ServiceDetail;

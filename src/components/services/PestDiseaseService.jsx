@@ -4,9 +4,10 @@ import { supabase } from '../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { cropDiseaseAPI } from '../../lib/api';
 import { API_CONFIG, validateFile } from '../../config/api';
+import CompactApiDocs from '../CompactApiDocs';
 
 const PestDiseaseService = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -14,35 +15,34 @@ const PestDiseaseService = () => {
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
   const [selectedCrop, setSelectedCrop] = useState(''); // New state for selected crop
-  const [cropList, setCropList] = useState([]); // State for crops from API
-  const [loadingCrops, setLoadingCrops] = useState(true);
+  const [cropList, setCropList] = useState([
+    'banana', 'brinjal', 'cabbage', 'cauliflower', 'chilli', 'cotton', 'grapes', 
+    'maize', 'mango', 'mustard', 'onion', 'oranges', 'papaya', 'pomegranade', 
+    'potato', 'rice', 'soyabean', 'sugarcane', 'tobacco', 'tomato', 'wheat'
+  ]); // Start with static crops
+  const [loadingCrops, setLoadingCrops] = useState(false); // Start as not loading
   const fileInputRef = useRef(null);
+
 
   // Helper function to format crop names for display
   const formatCropName = (crop) => {
     return crop.charAt(0).toUpperCase() + crop.slice(1).replace(/_/g, ' ');
   };
 
-  // Load crops from API on component mount
+  // Load crops from API on component mount (non-blocking)
   useEffect(() => {
     const loadCrops = async () => {
       try {
         const response = await cropDiseaseAPI.getCrops();
-        if (response.success) {
+        if (response.success && Array.isArray(response.data)) {
           setCropList(response.data);
-        } else {
-          // Fallback to static list if API fails
-          setCropList(API_CONFIG.SUPPORTED_CROPS);
         }
       } catch (error) {
         console.error('Failed to load crops from API:', error);
-        // Fallback to static list
-        setCropList(API_CONFIG.SUPPORTED_CROPS);
-      } finally {
-        setLoadingCrops(false);
       }
     };
 
+    // Try to load from API in background (non-blocking)
     loadCrops();
   }, []);
 
@@ -92,20 +92,22 @@ const PestDiseaseService = () => {
       
       const apiResults = apiResponse.data;
       
-      // Save to database using the new detections table schema
-      const { error: dbError } = await supabase
-        .from('detections')
-        .insert({
-          image_url: apiResults.image_url,
-          heatmap_url: apiResults.heatmap_url,
-          pest_name: apiResults.prediction,
-          confidence: apiResults.confidence,
-          crop_name: selectedCrop,
-          diagnosis: apiResults.diagnosis,
-          created_by: user.id
-        });
+      // Save to database using the new detections table schema (skip in demo mode)
+      if (!isDemoMode) {
+        const { error: dbError } = await supabase
+          .from('detections')
+          .insert({
+            image_url: apiResults.image_url,
+            heatmap_url: apiResults.heatmap_url,
+            pest_name: apiResults.prediction,
+            confidence: apiResults.confidence,
+            crop_name: selectedCrop,
+            diagnosis: apiResults.diagnosis,
+            created_by: user.id
+          });
 
-      if (dbError) throw dbError;
+        if (dbError) throw dbError;
+      }
 
       setResults(apiResults);
     } catch (err) {
@@ -116,28 +118,19 @@ const PestDiseaseService = () => {
     }
   };
 
-  if (!user) {
+  // For demo purposes, allow usage without authentication
+  const isDemoMode = !user;
+
+  // Show loading state while authentication is being checked
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Authentication Required</h2>
-          <p className="text-gray-600 mb-6">
-            Please log in or create an account to use the Pest & Disease Classification service.
-          </p>
-          <div className="space-y-3">
-            <button
-              onClick={() => navigate('/login')}
-              className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
-            >
-              Log In
-            </button>
-            <button
-              onClick={() => navigate('/register')}
-              className="w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors"
-            >
-              Create Account
-            </button>
-          </div>
+        <div className="text-center">
+          <svg className="animate-spin h-12 w-12 text-green-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -153,6 +146,19 @@ const PestDiseaseService = () => {
           <p className="text-xl text-gray-600">
             Upload an image of your crop to identify pests and diseases using AI
           </p>
+          {isDemoMode && (
+            <div className="mt-4 p-3 bg-blue-100 border border-blue-300 text-blue-700 rounded-lg">
+              <p className="text-sm">
+                <strong>Demo Mode:</strong> You're using the free demo. Results won't be saved to your account.
+                <button
+                  onClick={() => navigate('/login')}
+                  className="ml-2 text-blue-600 hover:text-blue-800 underline"
+                >
+                  Sign in to save results
+                </button>
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Crop Selection Dropdown */}
@@ -171,7 +177,7 @@ const PestDiseaseService = () => {
               <option value="">
                 {loadingCrops ? 'Loading crops...' : '-- Please select a crop --'}
               </option>
-              {cropList.map((crop) => (
+              {Array.isArray(cropList) && cropList.map((crop) => (
                 <option key={crop} value={crop}>
                   {formatCropName(crop)}
                 </option>
@@ -318,42 +324,50 @@ const PestDiseaseService = () => {
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">How It Works</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-green-600">1</span>
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* How It Works Section */}
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">How It Works</h2>
+            <div className="space-y-6">
+              <div className="text-center">
+                <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-green-600">1</span>
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">Select Crop</h3>
+                <p className="text-gray-600">Choose from 21 supported crop types using our crop-aware AI model</p>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Select Crop</h3>
-              <p className="text-gray-600">Choose from 21 supported crop types using our crop-aware AI model</p>
+              <div className="text-center">
+                <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-green-600">2</span>
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">Upload Image</h3>
+                <p className="text-gray-600">Take a photo of your crop or upload an existing image (160x160px optimized)</p>
+              </div>
+              <div className="text-center">
+                <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-green-600">3</span>
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">Get Results</h3>
+                <p className="text-gray-700">Receive crop-specific disease predictions with 15 disease classes per crop</p>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-green-600">2</span>
+            
+            <div className="mt-6 p-4 bg-green-50 rounded-lg">
+              <h3 className="text-lg font-semibold text-green-800 mb-2">Crop-Aware Model Features</h3>
+              <div className="space-y-2 text-sm text-green-700">
+                <div>
+                  <p><strong>21 Crops Supported:</strong> banana, brinjal, cabbage, cauliflower, chilli, cotton, grapes, maize, mango, mustard, onion, oranges, papaya, pomegranade, potato, rice, soyabean, sugarcane, tobacco, tomato, wheat</p>
+                </div>
+                <div>
+                  <p><strong>15 Disease Classes per Crop:</strong> healthy, bacterial_blight, anthracnose, leaf_spot, rust, verticillium_wilt, fusarium_wilt, leaf_curl, mosaic_virus, leaf_mold, early_blight, late_blight, root_rot, alternaria_blight, phomopsis_blight</p>
+                </div>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Upload Image</h3>
-              <p className="text-gray-600">Take a photo of your crop or upload an existing image (160x160px optimized)</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-green-600">3</span>
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Get Results</h3>
-              <p className="text-gray-700">Receive crop-specific disease predictions with 15 disease classes per crop</p>
             </div>
           </div>
-          
-          <div className="mt-8 p-4 bg-green-50 rounded-lg">
-            <h3 className="text-lg font-semibold text-green-800 mb-2">New Crop-Aware Model Features</h3>
-            <div className="grid md:grid-cols-2 gap-4 text-sm text-green-700">
-              <div>
-                <p><strong>21 Crops Supported:</strong> banana, brinjal, cabbage, cauliflower, chilli, cotton, grapes, maize, mango, mustard, onion, oranges, papaya, pomegranade, potato, rice, soyabean, sugarcane, tobacco, tomato, wheat</p>
-              </div>
-              <div>
-                <p><strong>15 Disease Classes per Crop:</strong> healthy, bacterial_blight, anthracnose, leaf_spot, rust, verticillium_wilt, fusarium_wilt, leaf_curl, mosaic_virus, leaf_mold, early_blight, late_blight, root_rot, alternaria_blight, phomopsis_blight</p>
-              </div>
-            </div>
+
+          {/* API Documentation Section */}
+          <div className="h-96">
+            <CompactApiDocs />
           </div>
         </div>
       </div>

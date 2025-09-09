@@ -14,8 +14,9 @@ import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import Dashboard from './components/dashboard/Dashboard';
 import PestDiseaseService from './components/services/PestDiseaseService';
-import GISRemoteSensingSection from './components/GISRemoteSensingSection';
 import GISServiceDetail from './components/GISServiceDetail';
+import GISAnalysisPage from './components/GISAnalysisPage';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -49,7 +50,6 @@ const LandingPage = () => (
     <main>
       <HeroSection />
       <ServiceDetail />
-      <GISRemoteSensingSection />
       <div className="bg-gray-100 dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="grid md:grid-cols-2 gap-8">
@@ -89,18 +89,18 @@ function App() {
             <Route 
               path="/pest-disease-service" 
               element={
-                <ProtectedRoute>
+                <ErrorBoundary>
                   <PestDiseaseService />
-                </ProtectedRoute>
+                </ErrorBoundary>
               } 
             />
             <Route 
               path="/gis-service/:serviceId" 
-              element={
-                <ProtectedRoute>
-                  <GISServiceDetail />
-                </ProtectedRoute>
-              } 
+              element={<GISServiceDetail />} 
+            />
+            <Route 
+              path="/gis-analysis/:analysisType" 
+              element={<GISAnalysisPage />} 
             />
             
             {/* API Documentation Route */}
