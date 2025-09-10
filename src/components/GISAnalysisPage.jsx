@@ -1,16 +1,30 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import LeafletMap from './LeafletMap';
+import TimeSeriesVisualization from './TimeSeriesVisualization';
+import FarmStatistics from './FarmStatistics';
 
 const GISAnalysisPage = () => {
   const { analysisType } = useParams();
   const navigate = useNavigate();
   const [drawnBoundary, setDrawnBoundary] = useState(null);
-  const [timeRange, setTimeRange] = useState({ start: '', end: '' });
   const [isDownloading, setIsDownloading] = useState(false);
   const [analysisData, setAnalysisData] = useState(null);
+
+  // Debug analysis data changes
+  useEffect(() => {
+    console.log('=== ANALYSIS DATA CHANGED ===');
+    console.log('New analysis data:', analysisData);
+    if (analysisData) {
+      console.log('Time series length:', analysisData.timeSeries?.length);
+      console.log('Metadata:', analysisData.metadata);
+    }
+  }, [analysisData]);
   const [selectedIndices, setSelectedIndices] = useState([]);
-  const [farmStats, setFarmStats] = useState(null);
+  const [timeRange, setTimeRange] = useState({
+    start: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    end: new Date().toISOString().split('T')[0]
+  });
 
   const analysisTypes = {
     vegetation: {
@@ -51,149 +65,138 @@ const GISAnalysisPage = () => {
     }
   };
 
-  const currentAnalysis = analysisTypes[analysisType] || analysisTypes.vegetation;
+  // Debug logging
+  console.log('GISAnalysisPage rendered with analysisType:', analysisType);
 
-  // Handle boundary input
-  const handleBoundaryInput = (coordinates) => {
+  const currentAnalysis = analysisTypes[analysisType] || analysisTypes.vegetation;
+  
+  // If no valid analysis type, show error
+  if (!analysisType || !analysisTypes[analysisType]) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-500 text-6xl mb-4">❌</div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Invalid Analysis Type</h1>
+          <p className="text-gray-600 mb-4">
+            The analysis type "{analysisType}" is not valid. 
+            Please select a valid analysis type from the services page.
+          </p>
+          <button
+            onClick={() => navigate('/')}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Go Back Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle boundary selection from map
+  const handleBoundarySelect = (coordinates) => {
+    console.log('=== BOUNDARY SELECTED ===');
+    console.log('Coordinates received:', coordinates);
+    console.log('Number of points:', coordinates?.length);
     setDrawnBoundary(coordinates);
-    setFarmStats(calculateFarmStats(coordinates));
   };
 
+  // Handle data download completion
+  const handleDataDownloaded = (data) => {
+    setAnalysisData(data);
+  };
+
+  // Handle data download
   const handleDownload = async () => {
-    if (!drawnBoundary || !timeRange.start || !timeRange.end) {
-      alert('Please draw a boundary and select time range');
+    if (!drawnBoundary || drawnBoundary.length < 3) {
+      alert('Please draw a valid boundary with at least 3 points');
+      return;
+    }
+    
+    if (selectedIndices.length === 0) {
+      alert('Please select at least one index to analyze');
       return;
     }
 
+    console.log('=== STARTING DATA DOWNLOAD ===');
+    console.log('Drawn boundary:', drawnBoundary);
+    console.log('Selected indices:', selectedIndices);
+    console.log('Time range:', timeRange);
+
     setIsDownloading(true);
     
-    // Simulate data download and processing
-    setTimeout(() => {
-      const mockData = generateMockAnalysisData();
+    try {
+      // Simulate API call for data download
+      console.log('Simulating API call...');
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Generate mock time series data
+      console.log('Generating mock data...');
+      const mockData = generateMockTimeSeriesData();
+      console.log('=== GENERATED MOCK DATA ===');
+      console.log('Mock data:', mockData);
+      console.log('Time series data length:', mockData.timeSeries?.length);
+      console.log('Available indices in data:', mockData.metadata?.indices);
+      console.log('First data point:', mockData.timeSeries?.[0]);
+      
+      console.log('Setting analysis data...');
       setAnalysisData(mockData);
-      setFarmStats(calculateFarmStats(drawnBoundary));
+      console.log('Analysis data set successfully!');
+      
+      // Scroll to results section
+      setTimeout(() => {
+        const resultsSection = document.querySelector('[data-results-section]');
+        if (resultsSection) {
+          resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+      
+    } catch (error) {
+      console.error('Error downloading data:', error);
+      alert('Error downloading data. Please try again.');
+    } finally {
       setIsDownloading(false);
-    }, 3000);
+      console.log('Download process completed');
+    }
   };
 
-  const generateMockAnalysisData = () => {
+  const generateMockTimeSeriesData = () => {
     const dates = [];
     const startDate = new Date(timeRange.start);
     const endDate = new Date(timeRange.end);
     
+    // Generate dates with 16-day intervals (typical satellite revisit)
     for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 16)) {
       dates.push(d.toISOString().split('T')[0]);
     }
 
     const data = dates.map(date => {
       const baseData = { date };
-      currentAnalysis.indices.forEach(index => {
-        baseData[index] = Math.random() * 0.8 + 0.1; // Random values between 0.1 and 0.9
+      selectedIndices.forEach(index => {
+        // Generate realistic values based on index type
+        let value;
+        if (index.includes('NDVI') || index.includes('EVI') || index.includes('SAVI')) {
+          value = Math.random() * 0.8 + 0.1; // 0.1 to 0.9
+        } else if (index.includes('NDWI') || index.includes('MNDWI')) {
+          value = Math.random() * 0.6 - 0.3; // -0.3 to 0.3
+        } else if (index.includes('BSI') || index.includes('NDTI')) {
+          value = Math.random() * 0.4 + 0.3; // 0.3 to 0.7
+        } else {
+          value = Math.random() * 0.8 + 0.1;
+        }
+        baseData[index] = parseFloat(value.toFixed(3));
       });
       return baseData;
     });
 
-    return data;
-  };
-
-  const calculateFarmStats = (boundary) => {
-    if (!boundary || boundary.length < 3) return null;
-
-    // Calculate area using shoelace formula
-    let area = 0;
-    const n = boundary.length;
-    for (let i = 0; i < n; i++) {
-      const j = (i + 1) % n;
-      area += boundary[i][0] * boundary[j][1];
-      area -= boundary[j][0] * boundary[i][1];
-    }
-    area = Math.abs(area) / 2;
-
-    // Convert to hectares (rough approximation)
-    const areaInHectares = area * 11132 * 11132 / 10000;
-
     return {
-      area: areaInHectares,
-      perimeter: calculatePerimeter(boundary),
-      center: calculateCenter(boundary),
-      boundingBox: calculateBoundingBox(boundary)
+      timeSeries: data,
+      metadata: {
+        boundary: drawnBoundary,
+        timeRange: timeRange,
+        indices: selectedIndices,
+        totalImages: Math.ceil((endDate - startDate) / (16 * 24 * 60 * 60 * 1000))
+      }
     };
-  };
-
-  const calculatePerimeter = (boundary) => {
-    let perimeter = 0;
-    for (let i = 0; i < boundary.length - 1; i++) {
-      const lat1 = boundary[i][0];
-      const lng1 = boundary[i][1];
-      const lat2 = boundary[i + 1][0];
-      const lng2 = boundary[i + 1][1];
-      
-      const R = 6371; // Earth's radius in km
-      const dLat = (lat2 - lat1) * Math.PI / 180;
-      const dLng = (lng2 - lng1) * Math.PI / 180;
-      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                Math.sin(dLng/2) * Math.sin(dLng/2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      perimeter += R * c;
-    }
-    return perimeter;
-  };
-
-  const calculateCenter = (boundary) => {
-    let lat = 0, lng = 0;
-    boundary.forEach(point => {
-      lat += point[0];
-      lng += point[1];
-    });
-    return {
-      lat: lat / boundary.length,
-      lng: lng / boundary.length
-    };
-  };
-
-  const calculateBoundingBox = (boundary) => {
-    let minLat = Infinity, maxLat = -Infinity;
-    let minLng = Infinity, maxLng = -Infinity;
-    
-    boundary.forEach(point => {
-      minLat = Math.min(minLat, point[0]);
-      maxLat = Math.max(maxLat, point[0]);
-      minLng = Math.min(minLng, point[1]);
-      maxLng = Math.max(maxLng, point[1]);
-    });
-    
-    return { minLat, maxLat, minLng, maxLng };
-  };
-
-  const getColorForIndex = (index) => {
-    const colors = {
-      'NDVI': '#00ff00',
-      'EVI': '#32cd32',
-      'RENDVI': '#228b22',
-      'SAVI': '#90ee90',
-      'NDWI': '#0000ff',
-      'MNDWI': '#4169e1',
-      'NDMI': '#1e90ff',
-      'NMDI': '#87ceeb',
-      'BSI': '#ffa500',
-      'NDTI': '#ff8c00',
-      'PSRI': '#ff7f50',
-      'CRI': '#ff6347',
-      'NDBI': '#808080',
-      'IBI': '#696969',
-      'BAEI': '#a9a9a9',
-      'EBBI': '#c0c0c0',
-      'NBR': '#ff0000',
-      'dNBR': '#dc143c',
-      'BAI': '#b22222',
-      'NDDI': '#8b0000',
-      'CIred-edge': '#800080',
-      'TGI': '#9370db',
-      'SI': '#8a2be2',
-      'NDSI': '#9932cc'
-    };
-    return colors[index] || '#000000';
   };
 
   return (
@@ -221,231 +224,238 @@ const GISAnalysisPage = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Map Section */}
-          <div className="lg:col-span-2">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Main Content Grid */}
+        <div className="grid xl:grid-cols-4 gap-8">
+          {/* Left Column - Map (3/4 width) */}
+          <div className="xl:col-span-3 space-y-8">
+            {/* Map Section */}
             <div className="bg-white rounded-lg shadow-sm border">
-              <div className="p-4 border-b">
-                <h2 className="text-lg font-semibold text-gray-900">Farm Boundary Mapping</h2>
-                <p className="text-sm text-gray-600">
-                  Enter your farm boundary coordinates manually or use the map interface below.
+              <div className="p-6 border-b">
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">Farm Boundary Mapping</h2>
+                <p className="text-gray-600">
+                  Use the interactive map below to draw your farm boundary. You can either draw directly on the map using the drawing tools or enter coordinates manually.
                 </p>
               </div>
               <div className="p-4">
-                {/* Simple coordinate input for now */}
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Enter Farm Boundary Coordinates (Lat, Lng)
-                    </label>
-                    <textarea
-                      placeholder="Enter coordinates in format: [[lat1, lng1], [lat2, lng2], [lat3, lng3], ...]"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      rows={4}
-                      onChange={(e) => {
-                        try {
-                          const coords = JSON.parse(e.target.value);
-                          if (Array.isArray(coords) && coords.length >= 3) {
-                            handleBoundaryInput(coords);
-                          }
-                        } catch (err) {
-                          // Invalid JSON, ignore
-                        }
-                      }}
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Example: [[28.6139, 77.2090], [28.6149, 77.2090], [28.6149, 77.2100], [28.6139, 77.2100]]
-                    </p>
-                  </div>
-                  
-                  {/* Quick preset buttons */}
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => {
-                        const coords = [
-                          [28.6139, 77.2090],
-                          [28.6149, 77.2090],
-                          [28.6149, 77.2100],
-                          [28.6139, 77.2100],
-                          [28.6139, 77.2090]
-                        ];
-                        handleBoundaryInput(coords);
-                      }}
-                      className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
-                    >
-                      Use Sample Boundary
-                    </button>
-                    <button
-                      onClick={() => setDrawnBoundary(null)}
-                      className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
-                    >
-                      Clear Boundary
-                    </button>
-                  </div>
+                <div className="h-[500px] w-full">
+                  <LeafletMap 
+                    onBoundarySelect={handleBoundarySelect}
+                    initialCenter={[28.6139, 77.2090]}
+                    initialZoom={10}
+                  />
                 </div>
               </div>
             </div>
 
-            {/* Time Range and Download */}
-            <div className="mt-4 bg-white rounded-lg shadow-sm border p-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Analysis Parameters</h3>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
-                  <input
-                    type="date"
-                    value={timeRange.start}
-                    onChange={(e) => setTimeRange(prev => ({ ...prev, start: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
-                  <input
-                    type="date"
-                    value={timeRange.end}
-                    onChange={(e) => setTimeRange(prev => ({ ...prev, end: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
+            {/* Configuration Section */}
+            <div className="bg-white rounded-lg shadow-sm border">
+              <div className="p-6 border-b">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Analysis Configuration</h3>
+                <p className="text-gray-600">Configure your analysis parameters and download satellite data.</p>
               </div>
-              
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Select Indices to Analyze</label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {currentAnalysis.indices.map(index => (
-                    <label key={index} className="flex items-center">
+              <div className="p-6 space-y-6">
+                {/* Time Range */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">Time Range</label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-2">Start Date</label>
                       <input
-                        type="checkbox"
-                        checked={selectedIndices.includes(index)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedIndices(prev => [...prev, index]);
-                          } else {
-                            setSelectedIndices(prev => prev.filter(i => i !== index));
-                          }
-                        }}
-                        className="mr-2 text-blue-600"
+                        type="date"
+                        value={timeRange.start}
+                        onChange={(e) => setTimeRange(prev => ({ ...prev, start: e.target.value }))}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
-                      <span className="text-sm text-gray-700">{index}</span>
-                    </label>
-                  ))}
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-2">End Date</label>
+                      <input
+                        type="date"
+                        value={timeRange.end}
+                        onChange={(e) => setTimeRange(prev => ({ ...prev, end: e.target.value }))}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              <button
-                onClick={handleDownload}
-                disabled={!drawnBoundary || !timeRange.start || !timeRange.end || isDownloading}
-                className={`mt-4 w-full px-4 py-2 rounded-md font-medium ${
-                  !drawnBoundary || !timeRange.start || !timeRange.end || isDownloading
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white'
-                }`}
-              >
-                {isDownloading ? 'Downloading & Processing...' : 'Download Data & Analyze'}
-              </button>
+                {/* Index Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Select Indices to Analyze ({selectedIndices.length} selected)
+                  </label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {currentAnalysis.indices.map(index => (
+                      <label key={index} className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedIndices.includes(index)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedIndices(prev => [...prev, index]);
+                            } else {
+                              setSelectedIndices(prev => prev.filter(i => i !== index));
+                            }
+                          }}
+                          className="mr-3 text-blue-600"
+                        />
+                        <span className="text-sm font-medium text-gray-700">{index}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                        {/* Download Button */}
+                        <div className="pt-4 space-y-3">
+                          <button
+                            onClick={handleDownload}
+                            disabled={!drawnBoundary || selectedIndices.length === 0 || isDownloading}
+                            className={`w-full px-6 py-4 rounded-lg font-medium text-lg transition-colors ${
+                              !drawnBoundary || selectedIndices.length === 0 || isDownloading
+                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                            }`}
+                          >
+                            {isDownloading ? (
+                              <div className="flex items-center justify-center">
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                                Downloading & Processing Satellite Data...
+                              </div>
+                            ) : (
+                              `Download Data & Analyze (${selectedIndices.length} indices)`
+                            )}
+                          </button>
+                          
+                          {/* Test Button - Remove in production */}
+                          {process.env.NODE_ENV === 'development' && (
+                            <button
+                              onClick={() => {
+                                const testData = generateMockTimeSeriesData();
+                                console.log('Test data generated:', testData);
+                                setAnalysisData(testData);
+                              }}
+                              className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
+                            >
+                              🧪 Generate Test Data
+                            </button>
+                          )}
+                        </div>
+              </div>
             </div>
           </div>
 
-          {/* Results Panel */}
-          <div className="space-y-6">
+          {/* Right Column - Results (1/4 width) */}
+          <div className="xl:col-span-1 space-y-6">
             {/* Farm Statistics */}
-            {farmStats && (
-              <div className="bg-white rounded-lg shadow-sm border p-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Farm Statistics</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Area:</span>
-                    <span className="text-sm font-medium">{farmStats.area.toFixed(2)} hectares</span>
+            {drawnBoundary && (
+              <div className="bg-white rounded-lg shadow-sm border">
+                <div className="p-4 border-b">
+                  <h3 className="text-lg font-semibold text-gray-900">Farm Statistics</h3>
+                </div>
+                <div className="p-4">
+                  <FarmStatistics 
+                    boundary={drawnBoundary}
+                    analysisData={analysisData}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Status Messages */}
+            {!drawnBoundary && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <span className="text-yellow-400 text-xl">⚠️</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Perimeter:</span>
-                    <span className="text-sm font-medium">{farmStats.perimeter.toFixed(2)} km</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Center Lat:</span>
-                    <span className="text-sm font-medium">{farmStats.center.lat.toFixed(4)}°</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Center Lng:</span>
-                    <span className="text-sm font-medium">{farmStats.center.lng.toFixed(4)}°</span>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-yellow-800">
+                      No Farm Boundary Defined
+                    </h3>
+                    <p className="mt-1 text-sm text-yellow-700">
+                      Please draw your farm boundary on the map to proceed with analysis.
+                    </p>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Time Series Chart */}
-            {analysisData && (
-              <div className="bg-white rounded-lg shadow-sm border p-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Time Series Analysis</h3>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={analysisData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis 
-                        dataKey="date" 
-                        tick={{ fontSize: 10 }}
-                        angle={-45}
-                        textAnchor="end"
-                        height={60}
-                      />
-                      <YAxis tick={{ fontSize: 10 }} />
-                      <Tooltip />
-                      {selectedIndices.map(index => (
-                        <Line
-                          key={index}
-                          type="monotone"
-                          dataKey={index}
-                          stroke={getColorForIndex(index)}
-                          strokeWidth={2}
-                          dot={{ r: 3 }}
-                        />
-                      ))}
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            )}
-
-            {/* Heatmap Visualization */}
-            {analysisData && (
-              <div className="bg-white rounded-lg shadow-sm border p-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Spectral Indices Heatmap</h3>
-                <div className="space-y-2">
-                  {selectedIndices.map(index => {
-                    const values = analysisData.map(d => d[index]);
-                    const min = Math.min(...values);
-                    const max = Math.max(...values);
-                    const avg = values.reduce((a, b) => a + b, 0) / values.length;
-                    
-                    return (
-                      <div key={index} className="border rounded p-2">
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-sm font-medium">{index}</span>
-                          <span className="text-xs text-gray-600">Avg: {avg.toFixed(3)}</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div 
-                            className="h-2 rounded-full"
-                            style={{
-                              width: `${((avg - min) / (max - min)) * 100}%`,
-                              backgroundColor: getColorForIndex(index)
-                            }}
-                          ></div>
-                        </div>
-                        <div className="flex justify-between text-xs text-gray-500 mt-1">
-                          <span>{min.toFixed(3)}</span>
-                          <span>{max.toFixed(3)}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
+            {drawnBoundary && !analysisData && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <span className="text-blue-400 text-xl">ℹ️</span>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-blue-800">
+                      Ready for Analysis
+                    </h3>
+                    <p className="mt-1 text-sm text-blue-700">
+                      Select indices and click "Download Data & Analyze" to see results.
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
           </div>
         </div>
+
+        {/* Results Section - Full Width */}
+        {analysisData && (
+          <div className="mt-8 space-y-8" data-results-section>
+            {/* Time Series Analysis */}
+            <div className="bg-white rounded-lg shadow-sm border">
+              <div className="p-6 border-b">
+                <h3 className="text-xl font-semibold text-gray-900">Time Series Analysis</h3>
+                <p className="text-gray-600 mt-1">Interactive charts showing temporal changes in spectral indices</p>
+              </div>
+              <div className="p-6">
+                {analysisData && analysisData.timeSeries && analysisData.timeSeries.length > 0 ? (
+                  <div>
+                    <div className="mb-4 p-3 bg-green-100 border border-green-300 rounded text-sm">
+                      <p className="text-green-800">✅ Data loaded successfully! Time series data: {analysisData.timeSeries.length} points</p>
+                    </div>
+                    <TimeSeriesVisualization 
+                      data={analysisData}
+                      metadata={analysisData?.metadata}
+                    />
+                  </div>
+                ) : (
+                  <div className="text-center text-gray-500 py-8">
+                    <div className="text-4xl mb-2">📊</div>
+                    <p>No time series data available. Please check the console for debugging information.</p>
+                    <div className="mt-4 text-sm text-gray-400 max-w-4xl mx-auto">
+                      <p>Data structure:</p>
+                      <pre className="text-xs overflow-auto max-h-40 bg-gray-100 p-2 rounded">
+                        {JSON.stringify(analysisData, null, 2)}
+                      </pre>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Debug Section - Remove this in production */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <h4 className="font-semibold text-yellow-800 mb-2">Debug Info</h4>
+            <div className="text-sm text-yellow-700">
+              <p><strong>Analysis Data:</strong> {analysisData ? 'Present' : 'Not present'}</p>
+              <p><strong>Drawn Boundary:</strong> {drawnBoundary ? 'Present' : 'Not present'}</p>
+              <p><strong>Selected Indices:</strong> {selectedIndices.length}</p>
+              <p><strong>Is Downloading:</strong> {isDownloading ? 'Yes' : 'No'}</p>
+              {analysisData && (
+                <div className="mt-2">
+                  <p><strong>Time Series Data Length:</strong> {analysisData.timeSeries?.length || 0}</p>
+                  <p><strong>Available Indices:</strong> {JSON.stringify(analysisData.metadata?.indices || [])}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

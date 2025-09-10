@@ -100,7 +100,11 @@ function App() {
             />
             <Route 
               path="/gis-analysis/:analysisType" 
-              element={<GISAnalysisPage />} 
+              element={
+                <ErrorBoundary>
+                  <GISAnalysisPage />
+                </ErrorBoundary>
+              } 
             />
             
             {/* API Documentation Route */}
